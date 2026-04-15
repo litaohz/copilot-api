@@ -5,6 +5,7 @@ import { defineCommand, runMain } from "citty"
 import packageJson from "../package.json"
 import { auth } from "./auth"
 import { checkUsage } from "./check-usage"
+import { config } from "./config"
 import { debug } from "./debug"
 import { start } from "./start"
 
@@ -28,7 +29,7 @@ const main = defineCommand({
       process.exit(0)
     }
   },
-  subCommands: { auth, start, "check-usage": checkUsage, debug },
+  subCommands: { auth, start, config, "check-usage": checkUsage, debug },
 })
 
 await runMain(main)

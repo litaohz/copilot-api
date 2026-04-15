@@ -1,14 +1,11 @@
 #!/usr/bin/env node
 
 import { defineCommand } from "citty"
-import clipboard from "clipboardy"
 import consola from "consola"
 import { serve, type ServerHandler } from "srvx"
-import invariant from "tiny-invariant"
 
 import { ensurePaths } from "./lib/paths"
 import { initProxyFromEnv } from "./lib/proxy"
-import { generateEnvScript } from "./lib/shell"
 import { state } from "./lib/state"
 import { setupCopilotToken, setupGitHubToken } from "./lib/token"
 import { cacheModels, cacheVSCodeVersion } from "./lib/utils"
@@ -22,7 +19,6 @@ interface RunServerOptions {
   rateLimit?: number
   rateLimitWait: boolean
   githubToken?: string
-  claudeCode: boolean
   showToken: boolean
   proxyEnv: boolean
 }
@@ -65,50 +61,6 @@ export async function runServer(options: RunServerOptions): Promise<void> {
   )
 
   const serverUrl = `http://localhost:${options.port}`
-
-  if (options.claudeCode) {
-    invariant(state.models, "Models should be loaded by now")
-
-    const selectedModel = await consola.prompt(
-      "Select a model to use with Claude Code",
-      {
-        type: "select",
-        options: state.models.data.map((model) => model.id),
-      },
-    )
-
-    const selectedSmallModel = await consola.prompt(
-      "Select a small model to use with Claude Code",
-      {
-        type: "select",
-        options: state.models.data.map((model) => model.id),
-      },
-    )
-
-    const command = generateEnvScript(
-      {
-        ANTHROPIC_BASE_URL: serverUrl,
-        ANTHROPIC_AUTH_TOKEN: "dummy",
-        ANTHROPIC_MODEL: selectedModel,
-        ANTHROPIC_DEFAULT_SONNET_MODEL: selectedModel,
-        ANTHROPIC_SMALL_FAST_MODEL: selectedSmallModel,
-        ANTHROPIC_DEFAULT_HAIKU_MODEL: selectedSmallModel,
-        DISABLE_NON_ESSENTIAL_MODEL_CALLS: "1",
-        CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1",
-      },
-      "claude",
-    )
-
-    try {
-      clipboard.writeSync(command)
-      consola.success("Copied Claude Code command to clipboard!")
-    } catch {
-      consola.warn(
-        "Failed to copy to clipboard. Here is the Claude Code command:",
-      )
-      consola.log(command)
-    }
-  }
 
   consola.box(
     `🌐 Usage Viewer: https://billxc.github.io/copilot-api?endpoint=${serverUrl}/usage`,
@@ -167,13 +119,6 @@ export const start = defineCommand({
       description:
         "Provide GitHub token directly (must be generated using the `auth` subcommand)",
     },
-    "claude-code": {
-      alias: "c",
-      type: "boolean",
-      default: false,
-      description:
-        "Generate a command to launch Claude Code with Copilot API config",
-    },
     "show-token": {
       type: "boolean",
       default: false,
@@ -199,7 +144,6 @@ export const start = defineCommand({
       rateLimit,
       rateLimitWait: args.wait,
       githubToken: args["github-token"],
-      claudeCode: args["claude-code"],
       showToken: args["show-token"],
       proxyEnv: args["proxy-env"],
     })
