@@ -1,12 +1,23 @@
 #!/usr/bin/env node
 
-import { readFile, mkdir, writeFile } from "node:fs/promises"
+import { readFile, mkdir, writeFile, copyFile } from "node:fs/promises"
 import { homedir } from "node:os"
 import { join } from "node:path"
 
 import { defineCommand } from "citty"
 import consola from "consola"
-async function configureClaude(): Promise<void> {
+
+async function backupFile(filePath: string): Promise<void> {
+  try {
+    const backupPath = `${filePath}.bak`
+    await copyFile(filePath, backupPath)
+    consola.info(`Backup saved: ${backupPath}`)
+  } catch {
+    // File doesn't exist yet, no backup needed
+  }
+}
+
+async function configureClaude(port: number): Promise<void> {
   const configDir = join(homedir(), ".claude")
   const configPath = join(configDir, "settings.json")
 
@@ -32,12 +43,13 @@ async function configureClaude(): Promise<void> {
     ...existing,
     env: {
       ...existingEnv,
-      ANTHROPIC_BASE_URL: "http://localhost:4141",
+      ANTHROPIC_BASE_URL: `http://localhost:${port}`,
       ANTHROPIC_AUTH_TOKEN: "Powered by xc copilot",
     },
     model: "opus[1m]",
   }
 
+  await backupFile(configPath)
   await writeFile(configPath, JSON.stringify(merged, null, 2) + "\n", "utf-8")
   consola.success(`Claude Code configured: ${configPath}`)
 }
@@ -92,7 +104,7 @@ function setTomlSection(
   return content.trimEnd() + "\n\n" + block
 }
 
-async function configureCodex(): Promise<void> {
+async function configureCodex(port: number): Promise<void> {
   const configDir = join(homedir(), ".codex")
   const configPath = join(configDir, "config.toml")
 
@@ -113,9 +125,10 @@ async function configureCodex(): Promise<void> {
   content = setTomlSection(
     content,
     "model_providers.copilot-api",
-    'name = "copilot-api"\nbase_url = "http://localhost:4141/v1"\nwire_api = "responses"',
+    `name = "copilot-api"\nbase_url = "http://localhost:${port}/v1"\nwire_api = "responses"`,
   )
 
+  await backupFile(configPath)
   await writeFile(configPath, content, "utf-8")
   consola.success(`Codex CLI configured: ${configPath}`)
 }
@@ -139,6 +152,12 @@ export const config = defineCommand({
       default: false,
       description: "Configure Codex CLI (~/.codex/config.toml)",
     },
+    port: {
+      alias: "p",
+      type: "string",
+      default: "4141",
+      description: "Port the Copilot API server listens on",
+    },
   },
   async run({ args }) {
     if (!args.claude && !args.codex) {
@@ -146,12 +165,14 @@ export const config = defineCommand({
       process.exit(1)
     }
 
+    const port = Number.parseInt(args.port, 10)
+
     if (args.claude) {
-      await configureClaude()
+      await configureClaude(port)
     }
 
     if (args.codex) {
-      await configureCodex()
+      await configureCodex(port)
     }
   },
 })

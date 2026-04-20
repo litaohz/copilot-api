@@ -13,29 +13,17 @@ All notable changes to this project will be documented in this file.
 ### Removed
 - `--claude-code` flag from `start` command (replaced by `config --claude`)
 - `clipboardy` and `tiny-invariant` dependencies
+- Built-in daemon management (`xc-copilot-api-daemon`), replaced by [easy-service](https://github.com/billxc/easy-service)
 
 ## [1.1.3] - 2026-04-15
 
 ### Fixed
 - Enhanced beta header handling and logging for Anthropic 1M models
 
-## [1.1.2] - 2026-04-14
-
-### Fixed
-- Daemon uses `npx -y xc-copilot-api@latest` for reliable auto-update
-
 ## [1.1.0] - 2026-04-13
 
 ### Added
-- Daemon management (`xc-copilot-api-daemon`) with install/uninstall/status/restart/stop/logs subcommands
-- Windows support for daemon (Task Scheduler)
-- macOS support for daemon (launchd)
-- Linux support for daemon (systemd)
-
-### Changed
-- Split monolithic daemon.ts into per-OS modules (macos.ts, linux.ts, windows.ts)
-- Use Task Scheduler instead of Registry Run Key on Windows
-- Replace deprecated `wmic` with `Get-CimInstance` on Windows
+- Daemon management (later removed in 1.2.0, replaced by easy-service)
 
 ## [1.0.0] - 2026-04-10
 

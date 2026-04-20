@@ -35,7 +35,7 @@ A reverse-engineered proxy for the GitHub Copilot API that exposes it as an Open
 ## Features
 
 - **OpenAI & Anthropic Compatibility**: Exposes GitHub Copilot as an OpenAI-compatible (`/v1/chat/completions`, `/v1/models`, `/v1/embeddings`) and Anthropic-compatible (`/v1/messages`) API.
-- **Claude Code Integration**: Easily configure and launch [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) to use Copilot as its backend with a simple command-line flag (`--claude-code`).
+- **Claude Code & Codex CLI Integration**: Configure [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) or Codex CLI to use Copilot as backend with `config --claude` or `config --codex`.
 - **Usage Dashboard**: A web-based dashboard to monitor your Copilot API usage, view quotas, and see detailed statistics.
 - **Rate Limit Control**: Manage API usage with rate-limiting options (`--rate-limit`) and a waiting mechanism (`--wait`) to prevent errors from rapid requests.
 - **Manual Request Approval**: Manually approve or deny each API request for fine-grained control over usage (`--manual`).
@@ -188,10 +188,28 @@ Copilot API now uses a subcommand structure with these main commands:
 
 - `start`: Start the Copilot API server. This command will also handle authentication if needed.
 - `auth`: Run GitHub authentication flow without starting the server. This is typically used if you need to generate a token for use with the `--github-token` option, especially in non-interactive environments.
+- `config`: Configure external AI tools (Claude Code, Codex CLI) to use Copilot API.
 - `check-usage`: Show your current GitHub Copilot usage and quota information directly in the terminal (no server required).
 - `debug`: Display diagnostic information including version, runtime details, file paths, and authentication status. Useful for troubleshooting and support.
 
-A separate **[`xc-copilot-api-daemon`](docs/daemon.md)** CLI is available for managing the server as a background daemon (install, status, restart, stop, uninstall, logs) on macOS, Linux, and Windows.
+### Running as a Background Service
+
+Use [easy-service](https://github.com/billxc/easy-service) to run as a background service on macOS, Linux, and Windows:
+
+```bash
+# Install easy-service
+uv tool install git+https://github.com/billxc/easy-service.git
+
+# Install and start the service
+easy-service install copilot-api -- npx -y xc-copilot-api@latest start
+
+# Manage the service
+easy-service status copilot-api
+easy-service logs copilot-api -f
+easy-service restart copilot-api
+easy-service stop copilot-api
+easy-service uninstall copilot-api
+```
 
 ## Command Line Options
 
@@ -208,9 +226,15 @@ The following command line options are available for the `start` command:
 | --rate-limit   | Rate limit in seconds between requests                                        | none       | -r    |
 | --wait         | Wait instead of error when rate limit is hit                                  | false      | -w    |
 | --github-token | Provide GitHub token directly (must be generated using the `auth` subcommand) | none       | -g    |
-| --claude-code  | Generate a command to launch Claude Code with Copilot API config              | false      | -c    |
 | --show-token   | Show GitHub and Copilot tokens on fetch and refresh                           | false      | none  |
 | --proxy-env    | Initialize proxy from environment variables                                   | false      | none  |
+
+### Config Command Options
+
+| Option  | Description                                       | Default | Alias |
+| ------- | ------------------------------------------------- | ------- | ----- |
+| --claude | Configure Claude Code (`~/.claude/settings.json`) | false   | -c    |
+| --codex  | Configure Codex CLI (`~/.codex/config.toml`)      | false   | -x    |
 
 ### Auth Command Options
 
@@ -328,44 +352,29 @@ The dashboard provides a user-friendly interface to view your Copilot usage data
 
 ## Using with Claude Code
 
-This proxy can be used to power [Claude Code](https://docs.anthropic.com/en/claude-code), an experimental conversational AI assistant for developers from Anthropic.
+This proxy can be used to power [Claude Code](https://docs.anthropic.com/en/claude-code).
 
-There are two ways to configure Claude Code to use this proxy:
-
-### Interactive Setup with `--claude-code` flag
-
-To get started, run the `start` command with the `--claude-code` flag:
+The quickest way to get started:
 
 ```sh
-npx xc-copilot-api@latest start --claude-code
+# Start the server
+npx xc-copilot-api@latest start
+
+# Configure Claude Code (writes to ~/.claude/settings.json)
+npx xc-copilot-api@latest config --claude
 ```
 
-You will be prompted to select a primary model and a "small, fast" model for background tasks. After selecting the models, a command will be copied to your clipboard. This command sets the necessary environment variables for Claude Code to use the proxy.
+This merges the required `ANTHROPIC_BASE_URL` and `ANTHROPIC_AUTH_TOKEN` into your existing settings without overwriting other configuration. A backup of your original config is saved as `settings.json.bak`.
 
-Paste and run this command in a new terminal to launch Claude Code.
+> **Note:** Copilot API natively understands Claude model names (e.g. `claude-sonnet-4.5`, `opus[1m]`), so you don't need to set `ANTHROPIC_MODEL` or other model environment variables — they just work.
 
-### Manual Configuration with `settings.json`
-
-Alternatively, you can configure Claude Code by creating a `.claude/settings.json` file in your project's root directory. This file should contain the environment variables needed by Claude Code. This way you don't need to run the interactive setup every time.
-
-Here is an example `.claude/settings.json` file:
+If you prefer manual configuration, add the following to your `~/.claude/settings.json`:
 
 ```json
 {
   "env": {
     "ANTHROPIC_BASE_URL": "http://localhost:4141",
-    "ANTHROPIC_AUTH_TOKEN": "dummy",
-    "ANTHROPIC_MODEL": "gpt-4.1",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "gpt-4.1",
-    "ANTHROPIC_SMALL_FAST_MODEL": "gpt-4.1",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "gpt-4.1",
-    "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1",
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
-  },
-  "permissions": {
-    "deny": [
-      "WebSearch"
-    ]
+    "ANTHROPIC_AUTH_TOKEN": "Powered by xc copilot"
   }
 }
 ```
@@ -373,6 +382,30 @@ Here is an example `.claude/settings.json` file:
 You can find more options here: [Claude Code settings](https://docs.anthropic.com/en/docs/claude-code/settings#environment-variables)
 
 You can also read more about IDE integration here: [Add Claude Code to your IDE](https://docs.anthropic.com/en/docs/claude-code/ide-integrations)
+
+## Using with Codex CLI
+
+```sh
+# Start the server
+npx xc-copilot-api@latest start
+
+# Configure Codex CLI (writes to ~/.codex/config.toml)
+npx xc-copilot-api@latest config --codex
+```
+
+A backup of your original config is saved as `config.toml.bak`.
+
+If you prefer manual configuration, add the following to your `~/.codex/config.toml`:
+
+```toml
+model = "gpt-5.4"
+model_provider = "copilot-api"
+
+[model_providers.copilot-api]
+name = "copilot-api"
+base_url = "http://localhost:4141/v1"
+wire_api = "responses"
+```
 
 ## Running from Source
 
