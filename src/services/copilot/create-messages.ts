@@ -1,4 +1,3 @@
-import { logger } from "hono/logger"
 import { filterResponseHeaders, postCopilotPassthrough } from "./passthrough"
 import consola from "consola"
 
