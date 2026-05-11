@@ -17,7 +17,18 @@ async function backupFile(filePath: string): Promise<void> {
   }
 }
 
-async function configureClaude(port: number): Promise<void> {
+const CLAUDE_OPUS_MODELS: Record<string, string> = {
+  "4.7": "claude-opus-4.7-1m-internal",
+  "4.6": "claude-opus-4.6-1m",
+}
+
+async function configureClaude(port: number, modelVersion: string): Promise<void> {
+  const opusModel = CLAUDE_OPUS_MODELS[modelVersion]
+  if (!opusModel) {
+    consola.error(`Unknown Claude model version: ${modelVersion}. Supported: ${Object.keys(CLAUDE_OPUS_MODELS).join(", ")}`)
+    process.exit(1)
+  }
+
   const configDir = join(homedir(), ".claude")
   const configPath = join(configDir, "settings.json")
 
@@ -45,6 +56,8 @@ async function configureClaude(port: number): Promise<void> {
       ...existingEnv,
       ANTHROPIC_BASE_URL: `http://localhost:${port}`,
       ANTHROPIC_AUTH_TOKEN: "Powered by xc copilot",
+      ANTHROPIC_DEFAULT_OPUS_MODEL: opusModel,
+      CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS: "1",
     },
     model: "opus[1m]",
   }
@@ -120,7 +133,7 @@ async function configureCodex(port: number): Promise<void> {
     }
   }
 
-  content = setTomlTopLevelKey(content, "model", "gpt-5.4")
+  content = setTomlTopLevelKey(content, "model", "gpt-5.5")
   content = setTomlTopLevelKey(content, "model_provider", "copilot-api")
   content = setTomlSection(
     content,
@@ -152,6 +165,12 @@ export const config = defineCommand({
       default: false,
       description: "Configure Codex CLI (~/.codex/config.toml)",
     },
+    "claude-model": {
+      alias: "m",
+      type: "string",
+      default: "4.7",
+      description: "Claude Opus model version (4.7 or 4.6)",
+    },
     port: {
       alias: "p",
       type: "string",
@@ -168,7 +187,7 @@ export const config = defineCommand({
     const port = Number.parseInt(args.port, 10)
 
     if (args.claude) {
-      await configureClaude(port)
+      await configureClaude(port, args["claude-model"])
     }
 
     if (args.codex) {

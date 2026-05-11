@@ -70,7 +70,7 @@ export async function runServer(options: RunServerOptions): Promise<void> {
     fetch: server.fetch as ServerHandler,
     port: options.port,
     idleTimeout: 255,
-  })
+  } as Parameters<typeof serve>[0])
 }
 
 export const start = defineCommand({
