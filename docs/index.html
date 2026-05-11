@@ -228,7 +228,7 @@
                 </svg>
               </div>
               <h1 class="text-xl font-semibold tracking-tight">Copilot API</h1>
-              <!--VERSION_BADGE-->
+              <span id="version-slot"><!--VERSION_BADGE--></span>
             </div>
             <p class="text-sm" style="color: var(--fg-subtle)">Monitor usage, browse models, and configure clients</p>
           </div>
@@ -365,6 +365,19 @@
             if (!modelsRes.ok) throw new Error("Models: " + modelsRes.status);
             usageData = await usageRes.json();
             modelsData = await modelsRes.json();
+            // Populate version badge if it wasn't server-rendered.
+            const slot = document.getElementById("version-slot");
+            if (slot && !slot.firstElementChild) {
+              try {
+                const r = await fetch(base + "/?format=json");
+                if (r.ok) {
+                  const info = await r.json();
+                  if (info && info.version) {
+                    slot.innerHTML = `<span class="text-xs px-2 py-0.5 rounded-full font-mono" style="background: var(--bg-hover); color: var(--fg-muted)">v${info.version}</span>`;
+                  }
+                }
+              } catch {}
+            }
             statusDot.style.background = "var(--success)";
           } catch (e) {
             error = e.message;
