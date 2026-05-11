@@ -228,7 +228,7 @@
                 </svg>
               </div>
               <h1 class="text-xl font-semibold tracking-tight">Copilot API</h1>
-              <span id="version-badge" class="text-xs px-2 py-0.5 rounded-full font-mono" style="background: var(--bg-hover); color: var(--fg-muted); display: none"></span>
+              <!--VERSION_BADGE-->
             </div>
             <p class="text-sm" style="color: var(--fg-subtle)">Monitor usage, browse models, and configure clients</p>
           </div>
@@ -357,25 +357,14 @@
           statusDot.style.background = "var(--warning)";
           render();
           try {
-            const [usageRes, modelsRes, infoRes] = await Promise.all([
+            const [usageRes, modelsRes] = await Promise.all([
               fetch(base + "/usage"),
               fetch(base + "/models"),
-              fetch(base + "/?format=json").catch(() => null),
             ]);
             if (!usageRes.ok) throw new Error("Usage: " + usageRes.status);
             if (!modelsRes.ok) throw new Error("Models: " + modelsRes.status);
             usageData = await usageRes.json();
             modelsData = await modelsRes.json();
-            if (infoRes && infoRes.ok) {
-              try {
-                const info = await infoRes.json();
-                const badge = document.getElementById("version-badge");
-                if (info && info.version) {
-                  badge.textContent = "v" + info.version;
-                  badge.style.display = "";
-                }
-              } catch {}
-            }
             statusDot.style.background = "var(--success)";
           } catch (e) {
             error = e.message;

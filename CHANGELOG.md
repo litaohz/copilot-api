@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.4] - 2026-05-11
+
+### Changed
+- Redesigned dashboard and index page; unified local and online dashboard
+
 ## [1.2.0] - 2026-04-16
 
 ### Added

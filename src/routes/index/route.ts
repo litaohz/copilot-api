@@ -2,7 +2,7 @@ import { Hono } from "hono"
 
 import { state } from "~/lib/state"
 import packageJson from "../../../package.json"
-import { dashboardHtml } from "./page"
+import { renderDashboard } from "./page"
 
 export const indexRoute = new Hono()
 
@@ -24,5 +24,6 @@ indexRoute.get("/", (c) => {
     )
   }
 
-  return c.html(dashboardHtml)
+  const badge = `<span class="text-xs px-2 py-0.5 rounded-full font-mono" style="background: var(--bg-hover); color: var(--fg-muted)">v${version}</span>`
+  return c.html(renderDashboard(badge))
 })
