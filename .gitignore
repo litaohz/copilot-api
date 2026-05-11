@@ -14,4 +14,4 @@ node_modules/
 dist/
 claude_test/
 
-.DS_Store
+.DS_Store.claude/
