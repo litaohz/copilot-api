@@ -1,556 +1,619 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Copilot API Usage Dashboard</title>
+    <title>Copilot API Dashboard</title>
+
+    <script>
+      (function() {
+        const saved = localStorage.getItem("theme");
+        if (saved === "dark" || saved === "light") {
+          document.documentElement.setAttribute("data-theme", saved);
+        }
+      })();
+    </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
 
-    <script src="https://unpkg.com/lucide-react@0.378.0/dist/umd/lucide.min.js"></script>
-
     <style>
-      /* Gruvbox-themed color palette */
       :root {
-        /* Main Color Palette */
-        --color-red: #cc241d;
-        --color-green: #98971a;
-        --color-yellow: #d79921;
-        --color-blue: #458588;
-        --color-purple: #b16286;
-        --color-aqua: #689d6a;
-        --color-orange: #d65d0e;
-        --color-gray: #a89984;
-
-        /* Accent/Lighter/Darker Shades of Main Colors */
-        --color-red-accent: #fb4934;
-        --color-green-accent: #b8bb26;
-        --color-yellow-accent: #fabd2f;
-        --color-blue-accent: #83a598;
-        --color-purple-accent: #d3869b;
-        --color-aqua-accent: #8ec07c;
-        --color-orange-accent: #fe8019;
-        --color-gray-accent: #928374;
-
-        /* Background Colors */
-        --color-bg-darkest: #1d2021; /* bg0_h */
-        --color-bg: #282828; /* bg and bg0 */
-        --color-bg-light-1: #3c3836; /* bg1 */
-        --color-bg-light-2: #504945; /* bg2 */
-        --color-bg-light-3: #665c54; /* bg3 */
-        --color-bg-light-4: #7c6f64; /* bg4 */
-        --color-bg-soft: #32302f; /* bg0_s */
-
-        /* Foreground Colors */
-        --color-fg-darker: #a89984; /* fg4 - duplicate of gray */
-        --color-fg-dark: #bdae93; /* fg3 */
-        --color-fg-medium: #d5c4a1; /* fg2 */
-        --color-fg-light: #ebdbb2; /* fg and fg1 */
-        --color-fg-lightest: #fbf1c7; /* fg0 */
+        --bg: #ffffff;
+        --bg-elevated: #fafafa;
+        --bg-hover: #f4f4f5;
+        --border: #e4e4e7;
+        --border-strong: #d4d4d8;
+        --fg: #09090b;
+        --fg-muted: #52525b;
+        --fg-subtle: #a1a1aa;
+        --accent: #2563eb;
+        --accent-hover: #3b82f6;
+        --success: #059669;
+        --warning: #d97706;
+        --danger: #dc2626;
+        --purple: #9333ea;
       }
 
-      /* Custom styles using the new palette */
-      body {
-        font-family: "Inter", sans-serif;
-        background-color: var(--color-bg-darkest);
-        color: var(--color-fg-light);
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --bg: #0a0a0a;
+          --bg-elevated: #111111;
+          --bg-hover: #1a1a1a;
+          --border: #1f1f1f;
+          --border-strong: #2a2a2a;
+          --fg: #fafafa;
+          --fg-muted: #a1a1aa;
+          --fg-subtle: #71717a;
+          --accent: #3b82f6;
+          --accent-hover: #60a5fa;
+          --success: #10b981;
+          --warning: #f59e0b;
+          --danger: #ef4444;
+          --purple: #a855f7;
+        }
       }
 
-      /* Custom progress bar styles */
-      .progress-bar-bg {
-        background-color: var(--color-bg-light-1);
-      }
-      .progress-bar-fg {
-        transition: width 0.5s ease-in-out;
-      }
-
-      /* Custom scrollbar for the raw data view */
-      .code-block::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-      .code-block::-webkit-scrollbar-track {
-        background: var(--color-bg);
-      }
-      .code-block::-webkit-scrollbar-thumb {
-        background: var(--color-bg-light-3);
-      }
-      .code-block::-webkit-scrollbar-thumb:hover {
-        background: var(--color-bg-light-4);
+      :root[data-theme="dark"] {
+        --bg: #0a0a0a;
+        --bg-elevated: #111111;
+        --bg-hover: #1a1a1a;
+        --border: #1f1f1f;
+        --border-strong: #2a2a2a;
+        --fg: #fafafa;
+        --fg-muted: #a1a1aa;
+        --fg-subtle: #71717a;
+        --accent: #3b82f6;
+        --accent-hover: #60a5fa;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --purple: #a855f7;
       }
 
-      /* Style for focus rings to use variables */
-      .input-focus:focus {
-        --tw-ring-color: var(--color-blue);
-        border-color: var(--color-blue);
+      * { box-sizing: border-box; }
+
+      html, body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: "Inter", system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
 
+      .font-mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
 
+      .card {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+      }
+
+      .input {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--fg);
+        padding: 0.5rem 0.875rem;
+        font-size: 0.875rem;
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+      .input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgb(59 130 246 / 0.15);
+      }
+
+      .btn {
+        background: var(--fg);
+        color: var(--bg);
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: opacity 0.15s, transform 0.05s;
+        border: 0;
+        cursor: pointer;
+      }
+      .btn:hover { opacity: 0.9; }
+      .btn:active { transform: scale(0.98); }
+
+      .btn-ghost {
+        background: transparent;
+        color: var(--fg-muted);
+        border: 1px solid var(--border-strong);
+        border-radius: 6px;
+        padding: 0.25rem 0.625rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+      }
+      .btn-ghost:hover {
+        background: var(--bg-hover);
+        color: var(--fg);
+      }
+
+      .tab {
+        padding: 0.625rem 0;
+        margin-right: 1.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--fg-subtle);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+        transition: color 0.15s, border-color 0.15s;
+      }
+      .tab:hover { color: var(--fg-muted); }
+      .tab.active {
+        color: var(--fg);
+        border-bottom-color: var(--fg);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.125rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.6875rem;
+        font-weight: 500;
+        font-family: "JetBrains Mono", monospace;
+        background: var(--bg-hover);
+        color: var(--fg-muted);
+        border: 1px solid var(--border);
+      }
+
+      .progress-track {
+        background: var(--border);
+        border-radius: 9999px;
+        height: 6px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 9999px;
+        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      pre, code { font-family: "JetBrains Mono", ui-monospace, monospace; }
+
+      .code-block {
+        background: var(--bg);
+        border-radius: 0 0 12px 12px;
+      }
+
+      ::-webkit-scrollbar { width: 8px; height: 8px; }
+      ::-webkit-scrollbar-track { background: var(--bg); }
+      ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: var(--fg-subtle); }
+
+      .spinner {
+        width: 32px;
+        height: 32px;
+        border: 2px solid var(--border);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      .fade-in { animation: fadeIn 0.3s ease-out; }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
     </style>
   </head>
-  <body class="antialiased">
-    <div id="app" class="min-h-screen p-4 sm:p-6">
-      <div class="max-w-7xl mx-auto">
-        <!-- Header Section -->
-        <header class="mb-6">
-          <h1
-            class="text-2xl font-bold flex items-center gap-2"
-            style="color: var(--color-fg-lightest)"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="lucide lucide-gauge-circle h-7 w-7"
-              style="color: var(--color-aqua-accent)"
-            >
-              <path d="M15.6 3.3a10 10 0 1 0 5.1 5.1" />
-              <path
-                d="M12 12a1 1 0 0 0-1-1v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-3z"
-              />
-              <path d="M12 6.8a10 10 0 0 0 -3.2 7.2" />
+  <body>
+    <div class="min-h-screen">
+      <div class="max-w-6xl mx-auto px-6 py-10">
+        <!-- Header -->
+        <header class="mb-10 flex items-start justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--accent), var(--purple))">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                  <path d="M2 17l10 5 10-5"/>
+                  <path d="M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <h1 class="text-xl font-semibold tracking-tight">Copilot API</h1>
+            </div>
+            <p class="text-sm" style="color: var(--fg-subtle)">Monitor usage, browse models, and configure clients</p>
+          </div>
+          <button id="theme-toggle" class="btn-ghost flex items-center justify-center" style="width: 36px; height: 36px; padding: 0" aria-label="Toggle theme">
+            <svg id="theme-icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
             </svg>
-            <span>Copilot API Usage Dashboard</span>
-          </h1>
-          <p class="mt-1 text-sm" style="color: var(--color-gray)">
-            Should be the same as the one in VSCode
-          </p>
+            <svg id="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
         </header>
 
-        <!-- Form Section -->
-        <div
-          class="mb-6 p-4 border"
-          style="
-            background-color: var(--color-bg-soft);
-            border-color: var(--color-bg-light-2);
-          "
-        >
-          <form
-            id="endpoint-form"
-            class="flex flex-col sm:flex-row items-center gap-3"
-          >
-            <label
-              for="endpoint-url"
-              class="font-semibold whitespace-nowrap text-sm"
-              style="color: var(--color-fg-lightest)"
-              >API Endpoint URL</label
-            >
-            <input
-              type="text"
-              id="endpoint-url"
-              class="w-full px-3 py-1.5 border focus:ring-1 transition input-focus text-sm"
-              style="
-                background-color: var(--color-bg-darkest);
-                border-color: var(--color-bg-light-3);
-                color: var(--color-fg-medium);
-              "
-              placeholder="http://localhost:4141/usage"
-            />
-            <button
-              id="fetch-button"
-              type="submit"
-              class="w-full sm:w-auto font-bold py-1.5 px-5 transition-colors flex items-center justify-center gap-2 text-sm"
-              style="
-                background-color: var(--color-blue);
-                color: var(--color-bg-darkest);
-              "
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="lucide lucide-refresh-cw h-4 w-4"
-              >
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-                <path d="M21 3v5h-5" />
-                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
-                <path d="M3 21v-5h5" />
-              </svg>
-              <span>Fetch</span>
-            </button>
-          </form>
+        <!-- Server Connection -->
+        <div class="card p-4 mb-8">
+          <div class="flex items-center gap-3">
+            <div class="flex-1 flex items-center gap-2">
+              <div id="status-dot" class="w-2 h-2 rounded-full" style="background: var(--fg-subtle)"></div>
+              <input
+                type="text"
+                id="base-url"
+                class="input flex-1 font-mono"
+                placeholder="http://localhost:4141"
+              />
+            </div>
+            <button id="connect-btn" class="btn">Connect</button>
+          </div>
         </div>
 
-        <!-- Content Area for dynamic data -->
-        <main id="content-area"></main>
+        <!-- Tabs -->
+        <div class="flex border-b mb-6" style="border-color: var(--border)">
+          <button class="tab active" data-tab="usage">Usage</button>
+          <button class="tab" data-tab="models">Models</button>
+          <button class="tab" data-tab="config">Config</button>
+        </div>
+
+        <!-- Content -->
+        <main id="content-area" class="fade-in"></main>
       </div>
+
+      <footer class="text-center py-6 text-xs" style="color: var(--fg-subtle)">
+        <a href="https://github.com/billxc/copilot-api" target="_blank" rel="noopener noreferrer"
+          class="hover:underline" style="color: var(--fg-muted)">github.com/billxc/copilot-api</a>
+      </footer>
     </div>
 
     <script>
+      function copyToClipboard(btn) {
+        const code = btn.getAttribute("data-code");
+        navigator.clipboard.writeText(code).then(() => {
+          const orig = btn.textContent;
+          btn.textContent = "Copied";
+          btn.style.color = "var(--success)";
+          setTimeout(() => { btn.textContent = orig; btn.style.color = ""; }, 1500);
+        });
+      }
+
       document.addEventListener("DOMContentLoaded", () => {
-        const endpointForm = document.getElementById("endpoint-form");
-        const endpointUrlInput = document.getElementById("endpoint-url");
+        // Theme toggle
+        const themeToggle = document.getElementById("theme-toggle");
+        const sunIcon = document.getElementById("theme-icon-sun");
+        const moonIcon = document.getElementById("theme-icon-moon");
+
+        function currentTheme() {
+          const set = document.documentElement.getAttribute("data-theme");
+          if (set) return set;
+          return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        function updateThemeIcon() {
+          const isDark = currentTheme() === "dark";
+          sunIcon.style.display = isDark ? "block" : "none";
+          moonIcon.style.display = isDark ? "none" : "block";
+        }
+        themeToggle.addEventListener("click", () => {
+          const next = currentTheme() === "dark" ? "light" : "dark";
+          document.documentElement.setAttribute("data-theme", next);
+          localStorage.setItem("theme", next);
+          updateThemeIcon();
+        });
+        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+          if (!document.documentElement.getAttribute("data-theme")) updateThemeIcon();
+        });
+        updateThemeIcon();
+
+        const baseUrlInput = document.getElementById("base-url");
+        const connectBtn = document.getElementById("connect-btn");
+        const statusDot = document.getElementById("status-dot");
         const contentArea = document.getElementById("content-area");
-        const fetchButton = document.getElementById("fetch-button");
+        const tabBtns = document.querySelectorAll(".tab");
 
-        // Apply hover effect for fetch button via JS
-        fetchButton.addEventListener("mouseenter", () => {
-          fetchButton.style.backgroundColor = "var(--color-blue-accent)";
+        const DEFAULT_BASE = "http://localhost:4141";
+        let activeTab = "usage";
+        let usageData = null;
+        let modelsData = null;
+        let isLoading = false;
+        let error = null;
+
+        tabBtns.forEach(btn => {
+          btn.addEventListener("click", () => {
+            activeTab = btn.dataset.tab;
+            tabBtns.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            render();
+          });
         });
-        fetchButton.addEventListener("mouseleave", () => {
-          fetchButton.style.backgroundColor = "var(--color-blue)";
+
+        connectBtn.addEventListener("click", () => connect());
+        baseUrlInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") connect();
         });
 
-        const DEFAULT_ENDPOINT = "http://localhost:4141/usage";
+        function connect() {
+          const base = baseUrlInput.value.trim().replace(/\/+$/, "");
+          try {
+            const u = new URL(window.location);
+            u.searchParams.set("endpoint", base);
+            window.history.pushState({}, "", u);
+          } catch (e) {}
+          fetchAll(base);
+        }
 
-        // --- State Management ---
-        const state = {
-          isLoading: false,
-          error: null,
-          data: null,
-        };
-
-        // --- Rendering Logic ---
-
-        /**
-         * Safely calls lucide.createIcons() if the library is available.
-         */
-        function createIcons() {
-          if (typeof lucide !== "undefined") {
-            lucide.createIcons();
+        async function fetchAll(base) {
+          isLoading = true;
+          error = null;
+          statusDot.style.background = "var(--warning)";
+          render();
+          try {
+            const [usageRes, modelsRes] = await Promise.all([
+              fetch(base + "/usage"),
+              fetch(base + "/models"),
+            ]);
+            if (!usageRes.ok) throw new Error("Usage: " + usageRes.status);
+            if (!modelsRes.ok) throw new Error("Models: " + modelsRes.status);
+            usageData = await usageRes.json();
+            modelsData = await modelsRes.json();
+            statusDot.style.background = "var(--success)";
+          } catch (e) {
+            error = e.message;
+            usageData = null;
+            modelsData = null;
+            statusDot.style.background = "var(--danger)";
+          } finally {
+            isLoading = false;
+            render();
           }
         }
 
-        /**
-         * Renders the entire UI based on the current state.
-         */
         function render() {
-          if (state.isLoading) {
+          contentArea.classList.remove("fade-in");
+          void contentArea.offsetWidth;
+          contentArea.classList.add("fade-in");
+
+          if (isLoading && activeTab !== "config") {
             contentArea.innerHTML = renderSpinner();
             return;
           }
-          if (state.error) {
-            contentArea.innerHTML = renderError(state.error);
-          } else if (state.data) {
-            contentArea.innerHTML = `
-                        ${renderUsageQuotas(state.data.quota_snapshots)}
-                        ${renderDetailedData(state.data)}
-                    `;
-          } else {
-            contentArea.innerHTML = renderWelcomeMessage();
+          if (error && activeTab !== "config") {
+            contentArea.innerHTML = renderError(error);
+            return;
           }
-          // Replace placeholder icons with actual Lucide icons
-          createIcons();
+          if (activeTab === "usage") {
+            contentArea.innerHTML = usageData ? renderUsage(usageData) : renderEmpty("Connect to view usage data");
+          } else if (activeTab === "models") {
+            contentArea.innerHTML = modelsData ? renderModels(modelsData) : renderEmpty("Connect to view available models");
+          } else if (activeTab === "config") {
+            contentArea.innerHTML = renderConfig();
+          }
         }
 
-        /**
-         * Renders the "Usage Quotas" section with progress bars.
-         * @param {object} snapshots - The quota_snapshots object from the API response.
-         * @returns {string} HTML string for the usage quotas section.
-         */
-        function renderUsageQuotas(snapshots) {
-          if (!snapshots) return "";
+        // === Usage Tab ===
+        function renderUsage(data) {
+          const quotas = data.quota_snapshots ? renderQuotas(data.quota_snapshots) : "";
+          const details = renderRawData(data);
+          return quotas + details;
+        }
 
-          const quotaCards = Object.entries(snapshots)
-            .map(([key, value]) => {
-              return renderQuotaCard(key, value);
-            })
-            .join("");
+        function renderQuotas(snapshots) {
+          const cards = Object.entries(snapshots).map(([k, v]) => renderQuotaCard(k, v)).join("");
+          return `
+            <section class="mb-8">
+              <h2 class="text-xs uppercase tracking-wider mb-4 font-medium" style="color: var(--fg-subtle)">Quotas</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${cards}</div>
+            </section>`;
+        }
+
+        function renderQuotaCard(title, d) {
+          const pctUsed = d.unlimited ? 0 : 100 - d.percent_remaining;
+          const used = d.unlimited ? "—" : (d.entitlement - d.remaining).toLocaleString();
+          let barColor = "var(--success)";
+          if (pctUsed > 75) barColor = "var(--warning)";
+          if (pctUsed > 90) barColor = "var(--danger)";
+          if (d.unlimited) barColor = "var(--accent)";
 
           return `
-                    <section id="usage-quotas" class="mb-6">
-                        <h2 class="text-xl font-bold mb-3 flex items-center gap-2" style="color: var(--color-fg-lightest);">
-                            <i data-lucide="bar-chart-big"></i> Usage Quotas
-                        </h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            ${quotaCards}
-                        </div>
-                    </section>
-                `;
-        }
-
-        /**
-         * Renders a single quota card.
-         * @param {string} title - The name of the quota (e.g., 'chat').
-         * @param {object} details - The details object for the quota.
-         * @returns {string} HTML string for a single card.
-         */
-        function renderQuotaCard(title, details) {
-          const { entitlement, remaining, percent_remaining, unlimited } =
-            details;
-
-          const percentUsed = unlimited ? 0 : 100 - percent_remaining;
-          const used = unlimited
-            ? "N/A"
-            : (entitlement - remaining).toLocaleString();
-
-          let progressBarColor = "var(--color-green)";
-          if (percentUsed > 75) progressBarColor = "var(--color-yellow)";
-          if (percentUsed > 90) progressBarColor = "var(--color-red)";
-          if (unlimited) progressBarColor = "var(--color-blue)";
-
-          return `
-                    <div class="p-4 border" style="background-color: var(--color-bg); border-color: var(--color-bg-light-2);">
-                        <div class="flex justify-between items-center mb-2">
-                            <h3 class="text-md font-semibold capitalize" style="color: var(--color-fg-lightest);">${title.replace(/_/g, " ")}</h3>
-                            ${
-                              unlimited
-                                ? `<span class="px-2 py-0.5 text-xs font-medium" style="color: var(--color-blue-accent); background-color: var(--color-bg-light-1);">Unlimited</span>`
-                                : `<span class="text-sm font-mono" style="color: var(--color-fg-medium);">${percentUsed.toFixed(1)}% Used</span>`
-                            }
-                        </div>
-                        <div class="mb-3">
-                             <div class="w-full progress-bar-bg h-2">
-                                 <div class="progress-bar-fg h-2" style="width: ${unlimited ? 100 : percentUsed}%; background-color: ${progressBarColor};"></div>
-                             </div>
-                        </div>
-                        <div class="flex justify-between text-xs font-mono" style="color: var(--color-fg-dark);">
-                            <span>${used} / ${unlimited ? "∞" : entitlement.toLocaleString()}</span>
-                            <span>${unlimited ? "∞" : remaining.toLocaleString()} remaining</span>
-                        </div>
-                    </div>
-                `;
-        }
-
-        /**
-         * Recursively builds a formatted HTML list from a JSON object.
-         * @param {object} obj - The object to format.
-         * @returns {string} HTML string for the formatted list.
-         */
-        function formatObject(obj) {
-          if (obj === null || typeof obj !== "object") {
-            return `<span style="color: var(--color-green-accent);">${JSON.stringify(obj)}</span>`;
-          }
-
-          return (
-            '<div class="pl-4">' +
-            Object.entries(obj)
-              .map(([key, value]) => {
-                const formattedKey = key.replace(/_/g, " ");
-                let displayValue;
-
-                if (Array.isArray(value)) {
-                  displayValue =
-                    value.length > 0
-                      ? `<span style='color: var(--color-gray-accent)'>[...${value.length} items]</span>`
-                      : `<span style='color: var(--color-gray-accent)'>[]</span>`;
-                } else if (typeof value === "object" && value !== null) {
-                  displayValue = formatObject(value);
-                } else if (typeof value === "boolean") {
-                  displayValue = `<span class="font-semibold" style="color: ${value ? "var(--color-green-accent)" : "var(--color-red-accent)"}">${value}</span>`;
-                } else {
-                  displayValue = `<span style="color: var(--color-blue-accent);">${JSON.stringify(value)}</span>`;
+            <div class="card p-5">
+              <div class="flex justify-between items-start mb-4">
+                <h3 class="text-sm font-semibold capitalize">${title.replace(/_/g, " ")}</h3>
+                ${d.unlimited
+                  ? `<span class="badge" style="color: var(--accent); border-color: var(--accent)">Unlimited</span>`
+                  : `<span class="text-xs font-mono" style="color: var(--fg-muted)">${pctUsed.toFixed(1)}%</span>`
                 }
-
-                return `<div class="mt-1">
-                                <span class="capitalize font-semibold" style="color: var(--color-fg-medium);">${formattedKey}:</span>
-                                ${typeof value === "object" && value !== null && !Array.isArray(value) ? displayValue : ` ${displayValue}`}
-                           </div>`;
-              })
-              .join("") +
-            "</div>"
-          );
-        }
-
-        /**
-         * Renders the section with the full, formatted API response.
-         * @param {object} data - The full API response data.
-         * @returns {string} HTML string for the full data section.
-         */
-        function renderDetailedData(data) {
-          const formattedDetails = formatObject(data);
-          return `
-                    <section id="detailed-data">
-                        <h2 class="text-xl font-bold mb-3 flex items-center gap-2" style="color: var(--color-fg-lightest);">
-                           <i data-lucide="file-text"></i> Detailed Information
-                        </h2>
-                        <div class="border p-4 relative font-mono text-xs" style="background-color: var(--color-bg-darkest); border-color: var(--color-bg-light-2);">
-                            ${formattedDetails}
-                        </div>
-                    </section>
-                `;
-        }
-
-        /**
-         * Renders a loading spinner.
-         * @returns {string} HTML string for the spinner.
-         */
-        function renderSpinner() {
-          return `
-            <div class="flex justify-center items-center py-20">
-                <div class="animate-spin h-12 w-12 rounded-full border-4 border-transparent border-t-4" style="border-top-color: var(--color-blue);"></div>
+              </div>
+              <div class="progress-track mb-3">
+                <div class="progress-fill" style="width: ${d.unlimited ? 100 : pctUsed}%; background: ${barColor}"></div>
+              </div>
+              <div class="flex justify-between text-xs font-mono" style="color: var(--fg-subtle)">
+                <span>${used} / ${d.unlimited ? "∞" : d.entitlement.toLocaleString()}</span>
+                <span>${d.unlimited ? "∞" : d.remaining.toLocaleString()} left</span>
+              </div>
             </div>`;
         }
 
-        /**
-         * Renders an error message box.
-         * @param {string} message - The error message to display.
-         * @returns {string} HTML string for the error message.
-         */
-        function renderError(message) {
-          const container = document.createElement("div");
-          container.className = "p-3 border";
-          container.style.backgroundColor = "rgba(204, 36, 29, 0.2)";
-          container.style.borderColor = "var(--color-red)";
-          container.style.color = "var(--color-red-accent)";
-          container.setAttribute("role", "alert");
-
-          container.innerHTML = `
-                <div class="flex items-center">
-                    <i data-lucide="alert-triangle" class="h-5 w-5 mr-3"></i>
-                    <div>
-                        <p class="font-bold text-sm">An Error Occurred</p>
-                        <p class="text-xs">${message}</p>
-                    </div>
-                </div>
-            `;
-          // Must create icons *after* innerHTML is set
-          setTimeout(
-            () =>
-              lucide.createIcons({
-                nodes: [container.querySelector("[data-lucide]")],
-              }),
-            0
-          );
-          return container.outerHTML;
-        }
-
-        /**
-         * Renders a welcome message when the page first loads.
-         * @returns {string} HTML string for the welcome message.
-         */
-        function renderWelcomeMessage() {
+        function renderRawData(data) {
           return `
-            <div class="text-center py-16 px-4 border" style="background-color: var(--color-bg-soft); border-color: var(--color-bg-light-2);">
-                <i data-lucide="info" class="mx-auto h-10 w-10" style="color: var(--color-gray-accent);"></i>
-                <h3 class="mt-2 text-lg font-semibold" style="color: var(--color-fg-lightest);">Welcome!</h3>
-                <p class="mt-1 text-sm" style="color: var(--color-gray);">Enter an API endpoint URL and click "Fetch" to see usage data.</p>
+            <section>
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xs uppercase tracking-wider font-medium" style="color: var(--fg-subtle)">Raw Response</h2>
+                <button class="btn-ghost" onclick='copyToClipboard(this)' data-code='${escapeAttr(JSON.stringify(data, null, 2))}'>Copy</button>
+              </div>
+              <div class="card overflow-hidden">
+                <pre class="p-5 text-xs overflow-auto" style="color: var(--fg-muted); max-height: 480px">${escapeHtml(JSON.stringify(data, null, 2))}</pre>
+              </div>
+            </section>`;
+        }
+
+        // === Models Tab ===
+        function renderModels(data) {
+          const models = data.data || [];
+          if (models.length === 0) return renderEmpty("No models available");
+
+          const vendorColors = {
+            azure: "var(--accent)",
+            anthropic: "var(--purple)",
+            openai: "var(--success)",
+            google: "var(--warning)",
+          };
+
+          // Group by vendor
+          const grouped = {};
+          models.forEach(m => {
+            const v = (m.owned_by || "other").toLowerCase();
+            if (!grouped[v]) grouped[v] = [];
+            grouped[v].push(m);
+          });
+
+          const sections = Object.entries(grouped).map(([vendor, items]) => {
+            const color = vendorColors[vendor] || "var(--fg-subtle)";
+            const cards = items.map(m => `
+              <div class="card p-4 hover:border-zinc-700 transition-colors" style="transition: border-color 0.15s">
+                <h3 class="text-sm font-semibold mb-1">${escapeHtml(m.display_name || m.id)}</h3>
+                <code class="text-xs font-mono" style="color: var(--fg-subtle)">${escapeHtml(m.id)}</code>
+              </div>
+            `).join("");
+            return `
+              <section class="mb-8">
+                <div class="flex items-center gap-2 mb-4">
+                  <div class="w-1.5 h-1.5 rounded-full" style="background: ${color}"></div>
+                  <h2 class="text-xs uppercase tracking-wider font-medium capitalize" style="color: var(--fg-subtle)">${escapeHtml(vendor)}</h2>
+                  <span class="text-xs font-mono" style="color: var(--fg-subtle)">${items.length}</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">${cards}</div>
+              </section>`;
+          }).join("");
+
+          return sections;
+        }
+
+        // === Config Tab ===
+        function renderConfig() {
+          const base = baseUrlInput.value.trim().replace(/\/+$/, "") || DEFAULT_BASE;
+
+          const configs = [
+            {
+              title: "Claude Code",
+              variant: "Opus 4.7",
+              path: "~/.claude/settings.json",
+              lang: "json",
+              code: JSON.stringify({
+                env: {
+                  ANTHROPIC_BASE_URL: base,
+                  ANTHROPIC_AUTH_TOKEN: "Powered by xc copilot",
+                  ANTHROPIC_DEFAULT_OPUS_MODEL: "claude-opus-4.7-1m-internal",
+                  CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS: "1",
+                },
+              }, null, 2),
+            },
+            {
+              title: "Claude Code",
+              variant: "Opus 4.6",
+              path: "~/.claude/settings.json",
+              lang: "json",
+              code: JSON.stringify({
+                env: {
+                  ANTHROPIC_BASE_URL: base,
+                  ANTHROPIC_AUTH_TOKEN: "Powered by xc copilot",
+                  ANTHROPIC_DEFAULT_OPUS_MODEL: "claude-opus-4.6-1m",
+                  CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS: "1",
+                },
+              }, null, 2),
+            },
+            {
+              title: "Codex CLI",
+              variant: "GPT-5.5",
+              path: "~/.codex/config.toml",
+              lang: "toml",
+              code: `model = "gpt-5.5"\nmodel_provider = "copilot-api"\n\n[model_providers.copilot-api]\nname = "copilot-api"\nbase_url = "${base}/v1"\nwire_api = "responses"`,
+            },
+            {
+              title: "Quick Setup",
+              variant: "CLI",
+              path: "Run in terminal",
+              lang: "bash",
+              code: `# Start the server\nnpx xc-copilot-api@latest start\n\n# Configure Claude Code (Opus 4.7 by default)\nnpx xc-copilot-api@latest config --claude\n\n# Or Opus 4.6\nnpx xc-copilot-api@latest config --claude -m 4.6\n\n# Configure Codex CLI\nnpx xc-copilot-api@latest config --codex`,
+            },
+          ];
+
+          const cards = configs.map(c => `
+            <div class="card overflow-hidden">
+              <div class="flex items-center justify-between px-4 py-3" style="border-bottom: 1px solid var(--border)">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-sm font-semibold">${escapeHtml(c.title)}</h3>
+                    <span class="badge">${escapeHtml(c.variant)}</span>
+                  </div>
+                  <p class="text-xs font-mono mt-1 truncate" style="color: var(--fg-subtle)">${escapeHtml(c.path)}</p>
+                </div>
+                <button class="btn-ghost flex-shrink-0" onclick="copyToClipboard(this)" data-code="${escapeAttr(c.code)}">Copy</button>
+              </div>
+              <pre class="code-block px-4 py-3 text-xs overflow-x-auto" style="color: var(--fg-muted)">${escapeHtml(c.code)}</pre>
             </div>
-          `;
+          `).join("");
+
+          return `
+            <section>
+              <p class="text-sm mb-6" style="color: var(--fg-muted)">Examples auto-generated from server URL <code class="font-mono px-1.5 py-0.5 rounded text-xs" style="background: var(--bg-elevated); color: var(--fg)">${escapeHtml(base)}</code></p>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">${cards}</div>
+            </section>`;
         }
 
-        // --- Data Fetching ---
+        // === Helpers ===
+        function renderSpinner() {
+          return `<div class="flex justify-center items-center py-24"><div class="spinner"></div></div>`;
+        }
 
-        /**
-         * Fetches data from the specified API endpoint.
-         */
-        async function fetchData() {
-          const url = endpointUrlInput.value.trim();
-          if (!url) {
-            state.error = "Endpoint URL cannot be empty.";
-            state.isLoading = false;
-            render();
-            return;
-          }
+        function renderError(msg) {
+          return `<div class="card p-5" style="border-color: var(--danger)">
+            <div class="flex items-start gap-3">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <div>
+                <p class="text-sm font-semibold" style="color: var(--danger)">Connection failed</p>
+                <p class="text-xs mt-1 font-mono" style="color: var(--fg-muted)">${escapeHtml(msg)}</p>
+              </div>
+            </div>
+          </div>`;
+        }
 
-          state.isLoading = true;
-          state.error = null;
+        function renderEmpty(msg) {
+          return `<div class="card p-12 text-center">
+            <p class="text-sm" style="color: var(--fg-subtle)">${escapeHtml(msg)}</p>
+          </div>`;
+        }
+
+        function escapeHtml(s) {
+          const d = document.createElement("div");
+          d.appendChild(document.createTextNode(String(s)));
+          return d.innerHTML;
+        }
+
+        function escapeAttr(s) {
+          return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // === Init ===
+        const urlParams = new URLSearchParams(window.location.search);
+        let endpoint = urlParams.get("endpoint") || "";
+        if (endpoint.endsWith("/usage")) {
+          endpoint = endpoint.replace(/\/usage$/, "");
+        }
+        baseUrlInput.value = endpoint || DEFAULT_BASE;
+        if (endpoint) {
+          fetchAll(endpoint);
+        } else {
           render();
-
-          try {
-            const response = await fetch(url);
-            if (!response.ok) {
-              throw new Error(
-                `Request failed with status ${response.status}: ${response.statusText}`
-              );
-            }
-            const jsonData = await response.json();
-            state.data = jsonData;
-          } catch (error) {
-            console.error("Fetch error:", error);
-            state.data = null;
-            state.error = error.message;
-          } finally {
-            state.isLoading = false;
-            render();
-          }
         }
-
-        // --- Event Handlers & Initialization ---
-
-        /**
-         * Handles the form submission to trigger a data fetch.
-         * @param {Event} event - The form submission event.
-         */
-        function handleFormSubmit(event) {
-          event.preventDefault();
-          const url = endpointUrlInput.value.trim();
-
-          // Update URL query parameter, catching potential security errors in sandboxed environments
-          try {
-            const currentUrl = new URL(window.location);
-            currentUrl.searchParams.set("endpoint", url);
-            window.history.pushState({}, "", currentUrl);
-          } catch (e) {
-            console.warn("Could not update URL: ", e.message);
-          }
-
-          fetchData();
-        }
-
-        /**
-         * Initializes the application.
-         */
-        function init() {
-          endpointForm.addEventListener("submit", handleFormSubmit);
-
-          // Get endpoint from URL param on load
-          const urlParams = new URLSearchParams(window.location.search);
-          const endpointFromUrl = urlParams.get("endpoint");
-
-          if (endpointFromUrl) {
-            endpointUrlInput.value = endpointFromUrl;
-            fetchData();
-          } else {
-            endpointUrlInput.value = DEFAULT_ENDPOINT;
-            render(); // Render initial welcome message
-          }
-        }
-
-        // Start the app
-        init();
       });
     </script>
-
-    <footer
-      class="text-center py-4 text-xs"
-      style="color: var(--color-gray-accent)"
-    >
-      <p>
-        Vibe coded by
-        <a
-          href="https://gemini.google.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="underline transition-colors"
-          style="color: var(--color-fg-dark)"
-          onmouseover="this.style.color='var(--color-fg-light)'"
-          onmouseout="this.style.color='var(--color-fg-dark)'"
-        >
-          Gemini
-        </a>
-        - Based on
-        <a
-          href="https://github.com/uheej0625/copilot-usage-viewer"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="underline transition-colors"
-          style="color: var(--color-fg-dark)"
-          onmouseover="this.style.color='var(--color-fg-light)'"
-          onmouseout="this.style.color='var(--color-fg-dark)'"
-        >
-          copilot-usage-viewer</a
-        >
-      </p>
-    </footer>
   </body>
 </html>
