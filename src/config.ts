@@ -18,8 +18,10 @@ async function backupFile(filePath: string): Promise<void> {
 }
 
 const CLAUDE_OPUS_MODELS: Record<string, string> = {
-  "4.7": "claude-opus-4.7-1m-internal",
-  "4.6": "claude-opus-4.6-1m",
+  "4.8": "claude-opus-4.8",
+  "4.7": "claude-opus-4.7",
+  "4.6": "claude-opus-4.6",
+  "4.5": "claude-opus-4.5",
 }
 
 async function configureClaude(port: number, modelVersion: string): Promise<void> {
@@ -59,7 +61,7 @@ async function configureClaude(port: number, modelVersion: string): Promise<void
       ANTHROPIC_DEFAULT_OPUS_MODEL: opusModel,
       CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS: "1",
     },
-    model: "opus[1m]",
+    model: "opus",
   }
 
   await backupFile(configPath)
@@ -168,8 +170,8 @@ export const config = defineCommand({
     "claude-model": {
       alias: "m",
       type: "string",
-      default: "4.7",
-      description: "Claude Opus model version (4.7 or 4.6)",
+      default: "4.8",
+      description: "Claude Opus model version (4.8, 4.7, 4.6 or 4.5)",
     },
     port: {
       alias: "p",
