@@ -1,3 +1,4 @@
+import consola from "consola"
 import { Hono } from "hono"
 
 import { forwardError } from "~/lib/error"
@@ -8,9 +9,14 @@ export const modelRoutes = new Hono()
 
 modelRoutes.get("/", async (c) => {
   try {
-    if (!state.models) {
-      // This should be handled by startup logic, but as a fallback.
+    // Always refresh from upstream so the dashboard and clients see the
+    // current model list rather than the snapshot taken at server startup.
+    // Fall back to the cached copy if the refresh fails for any reason.
+    try {
       await cacheModels()
+    } catch (error) {
+      if (!state.models) throw error
+      consola.warn("Failed to refresh models, serving cached copy", error)
     }
 
     const models = state.models?.data.map((model) => ({
