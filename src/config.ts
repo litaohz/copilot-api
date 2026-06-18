@@ -18,6 +18,7 @@ async function backupFile(filePath: string): Promise<void> {
 }
 
 const CLAUDE_OPUS_MODELS: Record<string, string> = {
+  "4.8": "claude-opus-4.8",
   "4.7": "claude-opus-4.7-1m-internal",
   "4.6": "claude-opus-4.6-1m",
 }
@@ -150,7 +151,7 @@ export const config = defineCommand({
   meta: {
     name: "config",
     description:
-      "Configure external AI tools (Claude Code, Codex CLI) to use Copilot API",
+      "Configure external AI tools (Claude Code, Codex CLI) to use Copilot API. Configures both by default; use --claude or --codex to target one.",
   },
   args: {
     claude: {
@@ -168,8 +169,8 @@ export const config = defineCommand({
     "claude-model": {
       alias: "m",
       type: "string",
-      default: "4.7",
-      description: "Claude Opus model version (4.7 or 4.6)",
+      default: "4.8",
+      description: "Claude Opus model version (4.8, 4.7, or 4.6)",
     },
     port: {
       alias: "p",
@@ -179,18 +180,16 @@ export const config = defineCommand({
     },
   },
   async run({ args }) {
-    if (!args.claude && !args.codex) {
-      consola.error("Specify at least one: --claude or --codex")
-      process.exit(1)
-    }
-
     const port = Number.parseInt(args.port, 10)
 
-    if (args.claude) {
+    // Default to configuring both when neither flag is specified.
+    const configureBoth = !args.claude && !args.codex
+
+    if (configureBoth || args.claude) {
       await configureClaude(port, args["claude-model"])
     }
 
-    if (args.codex) {
+    if (configureBoth || args.codex) {
       await configureCodex(port)
     }
   },
