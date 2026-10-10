@@ -27,6 +27,7 @@
     "dashboard/README.md": "8c36e734d153d3991de1b06cc1346c58a2627bbbe0f51b0d372334ba36547557",
     "dashboard/index.html": "a4ce47c28d7cf33c9c4fec64a738502c1cef2cda9c7da99fa422fce48491844c",
     "deployment/README.md": "1f601e5e86df0730c0d157dcc746245c74b2bdda76a65c3b922c13082cda7c67",
+    "deployment/cursor-rollout-20261010.md": "204971aa2ca79438f1159b99023d4df5383b3b4e071f55cc9b53f90f78b8908a",
     "deployment/cursor/README.md": "d7f55817d3492438672cd29c6924f9d2416d0bac0bc781deb0cfc5afcba44dd8",
     "deployment/cursor/config.example.yaml": "2f7bcda68e8eebe433b9a75f4c23c614a2eac1076ee922ec791396e1b22af929",
     "deployment/cursor/cursor-proxy.service": "fdad1b480fdfe3199163cc874320187859ac06462d675027dceb50a96f894f86",
