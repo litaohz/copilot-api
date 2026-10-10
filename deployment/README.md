@@ -1,5 +1,11 @@
 # FSD 代码与部署基线
 
+## 2026-10-10 加密错误诊断修复
+
+后续版本加入了 Responses 生成前 `invalid_request_body` 的有界识别，以及 HTTP 上游结构化错误透传。具体对照、参考实现和边界见 [decryption-investigation.md](decryption-investigation.md)。这项修复暴露真实拒绝并避免将其作为断流重试，不会解密或删除代理消息。当前文件哈希以 `production-manifest.json` 为准。
+
+以下关于旧 SHA-256、PID、无重启的描述是首次仓库合并基线的历史记录；后续发布需要另外记录发布回执。旧行为对照片段保存在 `tests/fixtures/production-before-error-fix.txt`。
+
 本仓库是 FSD 主服务与 `/dash` 监控页面的统一维护入口。2026-10-10 的整理先锁定线上运行版本，再把未进入源码的补丁还原到 `src/`；没有用新构建替换正在运行的服务。
 
 ## 代码归属
@@ -72,7 +78,7 @@ GitHub 的普通分支/PR CI 只构建和验证镜像；镜像推送只在版本
 以下问题保留在本次线上基线中，不把“版本同步”冒充“故障修复”：
 
 1. **错误统计不完整。** SSE 中的 `response.failed`、`incomplete` 和中途断流没有进入请求最终状态；`durationMs` 仅到响应头就绪。HTTP 200 不等于模型执行成功。
-2. **上游错误被字符串包装。** `src/lib/error.ts` 将上游 JSON 整体放进 `error.message`，丢失外层结构化 code/type，增加分类和诊断难度。
+2. **上游错误曾被字符串包装（后续修复）。** 当前源码保留 HTTP 上游结构化 error 与 request ID，并将生成前明确的 invalid_request_body 还原成 HTTP 400。其他生成后流式失败仍需完善终态统计。
 3. **取消传播被统计分流打断。** 离线执行线上 `stats-middleware.ts` 已复现：客户端取消后，`tee()` 的统计分支继续读取上游直至结束。Responses fetch 也未接收客户端 abort signal。单独适配器的取消测试通过不能代表整个服务会取消推理。
 4. **权限没有隔离。** 所有有效访问 key 都能访问 `/admin/*`；`/token` 还会返回上游 Copilot token。当前多 key 是归属统计，不是独立账号或管理权限边界。此结论来自路由与认证代码，未在审计输出中获取或展示上游 token。
 5. **per-key 聚合重启后丢失。** 线上补丁修复了 `byIp.keys` 的序列化，但未持久化 `byKey` 聚合；本次行为对照保留该现状，需另行修复。

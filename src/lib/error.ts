@@ -24,13 +24,23 @@ export async function forwardError(c: Context, error: unknown) {
       errorJson = errorText
     }
     consola.error("HTTP error:", errorJson)
+    const hasStructuredError =
+      typeof errorJson === "object"
+      && errorJson !== null
+      && "error" in errorJson
+      && typeof errorJson.error === "object"
+      && errorJson.error !== null
+    const requestId = error.response.headers.get("x-request-id")
+    if (requestId) c.header("x-request-id", requestId)
     return c.json(
-      {
-        error: {
-          message: errorText,
-          type: "error",
-        },
-      },
+      hasStructuredError ? errorJson : (
+        {
+          error: {
+            message: errorText,
+            type: "error",
+          },
+        }
+      ),
       error.response.status as ContentfulStatusCode,
     )
   }
