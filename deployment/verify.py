@@ -34,7 +34,7 @@ def main():
         git_commit = git('rev-parse', 'HEAD').decode().strip()
         if git('status', '--porcelain'):
             failures.append('Git working tree or index is not clean')
-        for name in manifest['runtimeFiles']:
+        for name in manifest['files']:
             if git('show', 'HEAD:' + name) != (root / name).read_bytes():
                 failures.append(name + ': differs from Git HEAD')
     print(json.dumps({'ok': not failures, 'commit': git_commit, 'checkedFiles': len(manifest['files']), 'failures': failures}, indent=2))

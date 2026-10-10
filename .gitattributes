@@ -4,3 +4,5 @@
 dist/main.js -text
 dist/stable-ids.mjs -text
 dist/responses-compat.mjs -text
+# An SSE event ends with a blank line; these fixture delimiters are intentional.
+tests/responses-stable-ids/fixtures/*.sse whitespace=-blank-at-eof
