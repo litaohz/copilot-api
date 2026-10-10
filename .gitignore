@@ -30,3 +30,9 @@ ecosystem.config.cjs
 ecosystem.config.cjs.*
 edge-id-backups/
 *.bak-*
+
+# Cursor sidecar runtime state belongs in private host directories.
+/deployment/cursor/config.yaml
+/deployment/cursor/auth/
+/deployment/cursor/private/
+/deployment/cursor/*-key.txt

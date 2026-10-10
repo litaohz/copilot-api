@@ -1,0 +1,15 @@
+# Rendered by install.py; the real config stays outside this repository.
+host: '127.0.0.1'
+port: 8318
+remote-management:
+  allow-remote: false
+  secret-key: ''
+  disable-control-panel: true
+auth-dir: '/var/lib/cursor-proxy/auth'
+api-keys:
+  - __CLIENT_API_KEY_JSON__
+request-retry: 0
+max-retry-interval: 0
+debug: false
+request-log: false
+logging-to-file: false

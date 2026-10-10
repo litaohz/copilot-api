@@ -53,3 +53,4 @@ This file is tailored for agentic coding agents. For more details, see the confi
 - Check `python3 deployment/verify.py --git` for a synchronized checkout; on the VM also pass `--deployed-dashboard /var/www/edge-dash/index.html`.
 - Run `bun run typecheck`, `bun run lint`, `bun test` and a build in a temporary directory for source changes. The deployed modules and imported streaming fixtures retain their original bytes and have dedicated behavioral tests.
 - Production credentials, PM2 environment files, logs, statistics and private backups are not source code and must never be committed.
+- The Cursor sidecar is maintained in `deployment/cursor/` (pinned CLIProxyAPIPlus, systemd and Nginx). Keep its secrets in `/var/lib/cursor-proxy`, outside Git; do not add Cursor bundle patches under `dashboard/`. Read `deployment/cursor/README.md` before changing or publishing that service.

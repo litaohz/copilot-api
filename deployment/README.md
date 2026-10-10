@@ -1,5 +1,14 @@
 # FSD 代码与部署基线
 
+## Cursor 代理统一维护
+
+Cursor 代理的固定发行版、配置模板、systemd 服务、Nginx 路由和安装脚本现统一放在
+[`deployment/cursor/`](cursor/README.md)。公网入口为 `/cursor/v1/`，后端为
+`127.0.0.1:8318` 的 `cursor-proxy.service`，与已在本地测通的 CLIProxyAPIPlus
+v7.3.12-1 一致。访问密钥和 OAuth 数据保存在仓库之外。此次按用户要求复用已有
+模型测试结果，不重新运行推理或测试套件；部署仅核对配置、进程和文件一致性。
+当前 `/dash` 仍统计 Copilot 请求，不含 Cursor 流量。
+
 ## 2026-10-10 加密错误诊断修复
 
 后续版本加入了 Responses 生成前 `invalid_request_body` 的有界识别，以及 HTTP 上游结构化错误透传。具体对照、参考实现和边界见 [decryption-investigation.md](decryption-investigation.md)。这项修复暴露真实拒绝并避免将其作为断流重试，不会解密或删除代理消息。当前文件哈希以 `production-manifest.json` 为准。
@@ -16,6 +25,7 @@
 | API key、管理接口、请求统计 | `src/lib/auth.ts`、`src/lib/stats*.ts`、`src/routes/admin/` | 原服务器未提交源码及线上多密钥补丁 |
 | GPT-6 流式 ID 兼容 | `src/lib/responses/` | 线上已部署的两个 `.mjs` 文件，原字节保留 |
 | 监控页面 | `dashboard/` | 当前 `/dash` 静态页面，原仓库 `litaohz/edge-proxy-dashboard` |
+| Cursor 独立代理 | `deployment/cursor/` | 固定 CLIProxyAPIPlus v7.3.12-1、服务与路由配置；私有状态不入库 |
 | 正在运行的成品 | `dist/main.js`、`dist/*.mjs` | 线上原件，Git 跟踪并逐文件校验 |
 | 验证与溯源 | `deployment/`、`tests/` | 本次整理 |
 
@@ -31,6 +41,7 @@ edge-fsd.japaneast.cloudapp.azure.com
   /dash              → /var/www/edge-dash/index.html
   /alt/*             → :4142 → 独立 Copilot 账号服务
   /antigravity/v1/*   → :8317 → 独立 AGY 服务
+  /cursor/v1/*        → :8318 → systemd cursor-proxy（CLIProxyAPIPlus）
 ```
 
 主服务路径为 `/home/taoli1/copilot-api/dist/main.js`，运行时 Node 20.19.4。审计时进程 PID 为 799390，自 2026-09-09 13:55:16 UTC 启动。

@@ -5,6 +5,11 @@ source, multi-key statistics, GPT-6 streaming compatibility and the static
 `dashboard/`. See [deployment/README.md](deployment/README.md) for the exact
 production baseline, verification command, repository history and known issues.
 
+The Cursor model proxy is maintained here as a pinned CLIProxyAPIPlus sidecar at
+`/cursor/v1/`. See [deployment/cursor/README.md](deployment/cursor/README.md) for
+client setup, service configuration and deployment. Its credentials are separate;
+the Copilot dashboard does not currently aggregate Cursor traffic.
+
 The checked-in `dist/` files preserve the running production version. Build new
 candidates outside that directory when checking changes. Runtime behavior must
 be implemented in `src/`; do not apply new minified-bundle patches from the old
