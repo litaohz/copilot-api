@@ -1,0 +1,25 @@
+[Unit]
+Description=Cursor model API proxy (FSD)
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=cursor-proxy
+Group=cursor-proxy
+WorkingDirectory=/var/lib/cursor-proxy
+Environment=HOME=/var/lib/cursor-proxy
+ExecStart=/opt/cursor-proxy/cli-proxy-api-plus -config /var/lib/cursor-proxy/config.yaml
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/cursor-proxy
+MemoryMax=512M
+
+[Install]
+WantedBy=multi-user.target

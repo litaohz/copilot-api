@@ -1,0 +1,9 @@
+{
+  "repository": "https://github.com/kaitranntt/CLIProxyAPIPlus",
+  "version": "v7.3.12-1",
+  "asset": "CLIProxyAPIPlus_7.3.12-1_linux_amd64_no-plugin.tar.gz",
+  "url": "https://github.com/kaitranntt/CLIProxyAPIPlus/releases/download/v7.3.12-1/CLIProxyAPIPlus_7.3.12-1_linux_amd64_no-plugin.tar.gz",
+  "sha256": "f768664c2d8e1fa2ae801c6966b9115927d38e06c44f332166c87d9a35892f38",
+  "executable": "cli-proxy-api-plus",
+  "executableSha256": "302652ff2b6b33fec5772f074c2bb735a5e48b65890aa48b667bd3f0ae03727a"
+}
