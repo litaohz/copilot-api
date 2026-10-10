@@ -1,2 +1,8 @@
-# Ensure shell scripts always use LF line endings
-entrypoint.sh text eol=lf
+# Keep production source bytes stable across Windows and Linux checkouts.
+* text eol=lf
+# These are the exact deployed artifacts, including their original bytes.
+dist/main.js -text
+dist/stable-ids.mjs -text
+dist/responses-compat.mjs -text
+# An SSE event ends with a blank line; these fixture delimiters are intentional.
+tests/responses-stable-ids/fixtures/*.sse whitespace=-blank-at-eof

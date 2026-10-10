@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>edge-fsd · proxy dashboard</title>
+<style>
+:root{
+  --bg:#0d1117; --panel:#161b22; --line:#21262d; --fg:#e6edf3; --dim:#8b949e;
+  --accent:#58a6ff; --ok:#3fb950; --warn:#d29922; --bad:#f85149; --purple:#bc8cff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:14px/1.5 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+header{padding:16px 22px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  position:sticky;top:0;background:var(--bg);z-index:10}
+h1{font-size:15px;margin:0;font-weight:600;letter-spacing:.3px}
+h1 span{color:var(--dim);font-weight:400}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--dim);display:inline-block}
+.dot.ok{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.dot.bad{background:var(--bad);box-shadow:0 0 8px var(--bad)}
+.spacer{flex:1}
+button{background:var(--panel);color:var(--fg);border:1px solid var(--line);
+  padding:6px 13px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px}
+button:hover{border-color:var(--accent);color:var(--accent)}
+#meta{color:var(--dim);font-size:12px}
+main{padding:20px 22px;max-width:1500px}
+#alert{background:rgba(248,81,73,.09);border:1px solid rgba(248,81,73,.4);
+  border-radius:8px;padding:13px 16px;margin-bottom:20px;font-size:13px;line-height:1.9}
+#alert code{background:#1c2128;padding:2px 6px;border-radius:4px}
+#oldwarn{background:rgba(210,153,34,.10);border:1px solid rgba(210,153,34,.55);
+  border-radius:8px;padding:13px 16px;margin-bottom:18px;font-size:13px;line-height:1.95}
+#keywatch{margin:0 0 26px}
+a.ip{text-decoration:none;border-bottom:1px dotted rgba(88,166,255,.45)}
+a.ip:hover{border-bottom-style:solid;color:#79c0ff}
+.card .v .sub{font-size:11px;color:var(--dim);font-weight:400;margin-top:3px}
+.card .k small{text-transform:none;letter-spacing:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-bottom:24px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.card .k{color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.6px}
+.card .v{font-size:23px;font-weight:600;margin-top:5px;letter-spacing:-.5px}
+h2{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;
+  margin:26px 0 10px;font-weight:600}
+table{width:100%;border-collapse:collapse;background:var(--panel);
+  border:1px solid var(--line);border-radius:8px;overflow:hidden}
+th{background:#1c2128;color:var(--dim);font-size:11px;text-transform:uppercase;
+  letter-spacing:.5px;text-align:left;padding:9px 12px;font-weight:600;
+  cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{color:var(--accent)}
+td{padding:8px 12px;border-top:1px solid var(--line);white-space:nowrap}
+tbody tr:hover{background:#1c2128}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.ip{color:var(--accent)}
+.bad{color:var(--bad)} .ok{color:var(--ok)} .warn{color:var(--warn)}
+.dim{color:var(--dim)}
+.bar{height:3px;background:var(--accent);border-radius:2px;margin-top:3px;opacity:.55}
+.models{color:var(--purple);font-size:11px;max-width:330px;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;display:block}
+.gate{max-width:420px;margin:90px auto;background:var(--panel);
+  border:1px solid var(--line);border-radius:10px;padding:26px}
+.gate input{width:100%;padding:9px 11px;margin:12px 0;background:var(--bg);
+  border:1px solid var(--line);border-radius:6px;color:var(--fg);font-family:inherit}
+.gate p{color:var(--dim);font-size:12px;margin:0}
+.err{color:var(--bad);font-size:12px;margin-top:10px;min-height:16px}
+.scroll{max-height:460px;overflow:auto;border-radius:8px}
+</style>
+</head>
+<body>
+
+<div id="gate" class="gate" hidden>
+  <div style="font-size:15px;font-weight:600">edge-fsd dashboard</div>
+  <p style="margin-top:6px">输入 EDGE_PROXY_TOKEN。只存在本机 localStorage，不会上传。</p>
+  <input id="tok" type="password" placeholder="sk-copilot-..." autocomplete="off">
+  <button onclick="saveTok()" style="width:100%">进入</button>
+  <div class="err" id="gerr"></div>
+</div>
+
+<div id="app" hidden>
+<header>
+  <span class="dot" id="dot"></span>
+  <h1>edge-fsd <span>japaneast</span></h1>
+  <span id="meta"></span>
+  <span class="spacer"></span>
+  <button onclick="load()">刷新</button>
+  <button onclick="logout()">登出</button>
+</header>
+<main>
+  <div id="oldwarn" hidden></div>
+  <div id="alert" hidden></div>
+  <div class="cards" id="cards"></div>
+  <div id="keywatch" hidden></div>
+
+  <h2>模型用量</h2>
+  <table id="tm"><thead><tr>
+    <th data-k="model">模型</th><th data-k="count" class="num">请求</th>
+    <th data-k="prompt" class="num">prompt</th><th data-k="completion" class="num">completion</th>
+    <th data-k="total" class="num">总 tokens</th><th data-k="share" class="num">占比</th>
+  </tr></thead><tbody></tbody></table>
+
+  <h2>调用来源 IP <span class="dim" id="ipnote"></span></h2>
+  <div class="scroll">
+  <table id="ti"><thead><tr>
+    <th data-k="ip">IP</th><th data-k="count" class="num">总请求</th>
+    <th data-k="authorized" class="num">授权</th><th data-k="unauthorized" class="num">401</th>
+    <th data-k="rate" class="num">401 率</th><th data-k="tokens" class="num">tokens</th>
+    <th data-k="lastSeen">最后活跃</th><th>token</th><th data-k="nm">模型</th>
+  </tr></thead><tbody></tbody></table>
+  </div>
+
+  <h2>HTTP 状态码</h2>
+  <table id="ts"><thead><tr>
+    <th data-k="status">状态</th><th data-k="count" class="num">次数</th><th class="num">占比</th>
+  </tr></thead><tbody></tbody></table>
+
+  <h2>最近请求</h2>
+  <div class="scroll">
+  <table id="tr"><thead><tr>
+    <th>时间</th><th>IP</th><th>方法</th><th>路径</th>
+    <th>模型</th><th class="num">状态</th><th class="num">延迟</th><th class="num">tokens</th>
+  </tr></thead><tbody></tbody></table>
+  </div>
+</main>
+</div>
+
+<script>
+const BASE="https://edge-fsd.japaneast.cloudapp.azure.com";
+const K="edge_proxy_token";
+let D=null, sortBy={tm:["count",-1],ti:["count",-1],ts:["count",-1]};
+
+const n=v=>(v==null?"–":v.toLocaleString("en-US"));
+const esc=s=>String(s??"").replace(/[<>&"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]));
+// IP -> 可点链接（不调任何 API、不外传，点了才在新标签查）
+function ipLink(ip){
+  const s=esc(ip);
+  return '<a class="ip" target="_blank" rel="noopener noreferrer" '+
+         'title="点击在 ipinfo.io 查询归属地" href="https://ipinfo.io/'+encodeURIComponent(ip)+'">'+s+'</a>';
+}
+function ago(t){
+  if(!t) return "–";
+  const d=(typeof t==="number")?new Date(t):new Date(t);
+  if(isNaN(d)) return "–";
+  const s=(Date.now()-d.getTime())/1000;
+  if(s<60) return Math.floor(s)+"秒前";
+  if(s<3600) return Math.floor(s/60)+"分前";
+  if(s<86400) return Math.floor(s/3600)+"小时前";
+  return Math.floor(s/86400)+"天前";
+}
+function dur(sec){
+  if(sec==null) return "–";
+  const d=Math.floor(sec/86400),h=Math.floor(sec%86400/3600),m=Math.floor(sec%3600/60);
+  return (d?d+"天 ":"")+(h?h+"时 ":"")+m+"分";
+}
+
+function saveTok(){
+  const v=document.getElementById("tok").value.trim();
+  if(!v){document.getElementById("gerr").textContent="token 不能为空";return}
+  localStorage.setItem(K,v); load();
+}
+function logout(){localStorage.removeItem(K);location.reload()}
+
+async function load(){
+  const t=localStorage.getItem(K);
+  if(!t){document.getElementById("gate").hidden=false;document.getElementById("app").hidden=true;return}
+  document.getElementById("meta").textContent="加载中…";
+  try{
+    const r=await fetch(BASE+"/admin/stats",{headers:{Authorization:"Bearer "+t}});
+    if(r.status===401){
+      localStorage.removeItem(K);
+      document.getElementById("gate").hidden=false;
+      document.getElementById("app").hidden=true;
+      document.getElementById("gerr").textContent="401 token 无效或已被轮换";
+      return;
+    }
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    D=await r.json();
+    document.getElementById("gate").hidden=true;
+    document.getElementById("app").hidden=false;
+    render();
+  }catch(e){
+    document.getElementById("meta").innerHTML='<span class="bad">加载失败: '+esc(e.message)+'</span>';
+    document.getElementById("dot").className="dot bad";
+  }
+}
+
+function render(){
+  const paused=D.paused;
+  document.getElementById("dot").className="dot "+(paused?"bad":"ok");
+  document.getElementById("meta").innerHTML=
+    (paused?'<span class="bad">已暂停</span>':'<span class="ok">运行中</span>')+
+    ' · uptime '+dur(D.uptimeSeconds)+' · 更新于 '+new Date().toLocaleTimeString("zh-CN");
+
+  const ips=D.ips||[], models=D.models||[], recent=D.recent||[];
+  const tot401=ips.reduce((a,b)=>a+(b.unauthorized||0),0);
+  // 反模式提醒: "有401的IP" 数量几乎全是扫描器噪声(每个IP 1-2次)。
+  // 真正的信号是 401 高度集中的 IP —— 那才是配置失效/正在重试的真实客户端。
+  const HEAVY=20;
+  const heavy=ips.filter(i=>(i.unauthorized||0)>=HEAVY)
+                 .sort((a,b)=>b.unauthorized-a.unauthorized);
+  const heavyN=heavy.length;
+  const heavy401=heavy.reduce((a,b)=>a+(b.unauthorized||0),0);
+  const tk=D.tokens||{};
+  const totTok=tk.total??models.reduce((a,b)=>a+(b.total||0),0);
+
+  const st5=(D.statuses&&!Array.isArray(D.statuses))
+    ? Object.entries(D.statuses).filter(([k])=>String(k)[0]==="5").reduce((a,[,v])=>a+v,0) : 0;
+  const st429=(D.statuses&&!Array.isArray(D.statuses))?(D.statuses["429"]||0):0;
+  document.getElementById("cards").innerHTML=[
+    ["总请求",n(D.totalRequests)],
+    ["总 tokens",n(totTok)],
+    ["来源 IP",n(ips.length)],
+    ["401 总数",'<span class="'+(tot401?"warn":"ok")+'">'+n(tot401)+"</span>"],
+    ["401 集中源 <small>(≥"+HEAVY+"次)</small>",
+      '<span class="'+(heavyN?"bad":"ok")+'">'+n(heavyN)+"</span>"+
+      '<div class="sub">占 401 的 '+(tot401?(heavy401/tot401*100).toFixed(0):0)+'%</div>'],
+    ["429 限流",'<span class="'+(st429?"warn":"ok")+'">'+n(st429)+"</span>"],
+    ["5xx 错误",'<span class="'+(st5?"bad":"ok")+'">'+n(st5)+"</span>"],
+    ["噪声拦截",n(D.droppedNoise)],
+  ].map(([k,v])=>'<div class="card"><div class="k">'+k+'</div><div class="v">'+v+"</div></div>").join("");
+
+  // 401 集中源告警条
+  const al=document.getElementById("alert");
+  if(heavyN){
+    al.hidden=false;
+    al.innerHTML='<b>⚠ '+heavyN+' 个 IP 有密集 401</b>（共 '+n(heavy401)+' 次）—— 这些是 token 失效后仍在重试的真实客户端，不是扫描器：<br>'+
+      heavy.slice(0,12).map(i=>'<code>'+ipLink(i.ip)+'</code> <span class="bad">'+n(i.unauthorized)+'×</span> <span class="dim">'+ago(i.lastSeen)+'</span>').join(" &nbsp;·&nbsp; ");
+  } else al.hidden=true;
+
+  // ===== Token 来源监控（重点：旧 token 仍在被谁使用）=====
+  const keys=D.keys||[];
+  const kOld=keys.find(k=>/OLD/i.test(k.key));
+  const kw=document.getElementById("keywatch");
+  if(keys.length){
+    kw.hidden=false;
+    const kmax=Math.max(...keys.map(k=>k.count||0),1);
+    kw.innerHTML='<h2 style="margin-top:0">Token 来源监控</h2>'+
+      '<table><thead><tr><th>Token</th><th class="num">请求</th><th class="num">来源 IP 数</th>'+
+      '<th class="num">tokens</th><th>最后使用</th><th>来源 IP</th></tr></thead><tbody>'+
+      keys.map(k=>{
+        const isOld=/OLD/i.test(k.key), isUn=k.key.startsWith("__");
+        const label=isOld?'<span class="bad">⚠ '+esc(k.key)+'</span>'
+                   :isUn?'<span class="dim">'+esc(k.key)+'</span>'
+                   :'<span class="ok">'+esc(k.key)+'</span>';
+        return '<tr'+(isOld?' style="background:rgba(248,81,73,.07)"':'')+'>'+
+          '<td>'+label+'</td>'+
+          '<td class="num">'+n(k.count)+'<div class="bar" style="width:'+((k.count||0)/kmax*100).toFixed(1)+'%'+(isOld?';background:var(--bad)':'')+'"></div></td>'+
+          '<td class="num">'+n(k.ipCount)+'</td>'+
+          '<td class="num dim">'+n(k.tokens)+'</td>'+
+          '<td class="dim">'+ago(k.lastSeen)+'</td>'+
+          '<td>'+(k.ips||[]).slice(0,8).map(ipLink).join(" ")+
+            ((k.ips||[]).length>8?' <span class="dim">+'+((k.ips.length)-8)+'</span>':'')+'</td></tr>';
+      }).join("")+'</tbody></table>';
+  } else kw.hidden=true;
+
+  // 旧 token 仍在使用 -> 顶部红条
+  const ow=document.getElementById("oldwarn");
+  if(kOld && kOld.count>0){
+    ow.hidden=false;
+    ow.innerHTML='<b>🔑 旧 token 仍在被使用</b> —— '+n(kOld.count)+' 次请求，来自 '+n(kOld.ipCount)+
+      ' 个 IP，最后一次 '+ago(kOld.lastSeen)+'。<br>'+
+      (kOld.ips||[]).slice(0,15).map(ipLink).join(" &nbsp; ")+
+      '<div class="dim" style="margin-top:6px">确认这些都是你自己的客户端后，即可从 ecosystem.config.cjs 中移除旧 key。</div>';
+  } else ow.hidden=true;
+
+
+  // 模型
+  const mmax=Math.max(...models.map(m=>m.total||0),1);
+  const mrows=models.map(m=>({...m,share:totTok?(m.total||0)/totTok:0}));
+  drawTable("tm",mrows,r=>'<tr>'+
+    '<td class="ip">'+esc(r.model)+'</td>'+
+    '<td class="num">'+n(r.count)+'</td>'+
+    '<td class="num dim">'+n(r.prompt)+'</td>'+
+    '<td class="num dim">'+n(r.completion)+'</td>'+
+    '<td class="num">'+n(r.total)+'<div class="bar" style="width:'+((r.total||0)/mmax*100).toFixed(1)+'%"></div></td>'+
+    '<td class="num">'+(r.share*100).toFixed(1)+'%</td></tr>');
+
+  // IP
+  document.getElementById("ipnote").textContent="（共 "+ips.length+" 个，明文）";
+  const irows=ips.map(i=>({...i,
+    rate:(i.count?(i.unauthorized||0)/i.count:0),
+    nm:(i.models||[]).length}));
+  drawTable("ti",irows,r=>{
+    const cls=r.rate>.5?"bad":(r.unauthorized?"warn":"ok");
+    return '<tr>'+
+    '<td>'+ipLink(r.ip)+'</td>'+
+    '<td class="num">'+n(r.count)+'</td>'+
+    '<td class="num ok">'+n(r.authorized)+'</td>'+
+    '<td class="num '+(r.unauthorized?"warn":"dim")+'">'+n(r.unauthorized)+'</td>'+
+    '<td class="num '+cls+'">'+(r.rate*100).toFixed(0)+'%</td>'+
+    '<td class="num dim">'+n(r.tokens)+'</td>'+
+    '<td class="dim">'+ago(r.lastSeen)+'</td>'+
+    '<td>'+((r.keys||[]).length?(r.keys||[]).map(k=>/OLD/i.test(k)?'<span class="bad">'+esc(k)+'</span>':'<span class="ok">'+esc(k)+'</span>').join(" "):'<span class="dim">–</span>')+'</td>'+
+    '<td><span class="models" title="'+esc((r.models||[]).join(", "))+'">'+esc((r.models||[]).join(", ")||"–")+'</span></td></tr>';
+  });
+
+  // 状态码
+  let st=D.statuses||{};
+  let srows=Array.isArray(st)?st:Object.entries(st).map(([status,count])=>({status,count}));
+  const stot=srows.reduce((a,b)=>a+(b.count||0),0)||1;
+  srows=srows.map(s=>({...s,share:s.count/stot}));
+  drawTable("ts",srows,r=>{
+    const c=String(r.status)[0], cls=c==="2"?"ok":(c==="4"?"warn":(c==="5"?"bad":"dim"));
+    return '<tr><td class="'+cls+'">'+esc(r.status)+'</td><td class="num">'+n(r.count)+
+      '</td><td class="num dim">'+(r.share*100).toFixed(1)+'%</td></tr>';
+  });
+
+  // 最近
+  document.querySelector("#tr tbody").innerHTML=recent.slice(0,200).map(r=>{
+    const c=String(r.status)[0], cls=c==="2"?"ok":(c==="4"?"warn":(c==="5"?"bad":"dim"));
+    return '<tr>'+
+      '<td class="dim">'+ago(r.time||r.timestamp)+'</td>'+
+      '<td>'+ipLink(r.ip)+'</td>'+
+      '<td class="dim">'+esc(r.method||"–")+'</td>'+
+      '<td class="dim">'+esc(r.path)+'</td>'+
+      '<td class="'+(r.model?"":"dim")+'" style="color:'+(r.model?"var(--purple)":"")+'">'+esc(r.model||"–")+'</td>'+
+      '<td class="num '+cls+'">'+esc(r.status)+'</td>'+
+      '<td class="num dim">'+(r.latency!=null?r.latency+"ms":"–")+'</td>'+
+      '<td class="num dim">'+(r.tokens!=null?n(r.tokens):"–")+'</td></tr>';
+  }).join("");
+}
+
+function drawTable(id,rows,fmt){
+  const [key,dir]=sortBy[id];
+  const s=[...rows].sort((a,b)=>{
+    const x=a[key],y=b[key];
+    if(typeof x==="number"&&typeof y==="number") return (x-y)*dir;
+    return String(x??"").localeCompare(String(y??""))*dir;
+  });
+  document.querySelector("#"+id+" tbody").innerHTML=s.map(fmt).join("");
+}
+
+document.querySelectorAll("th[data-k]").forEach(th=>{
+  th.onclick=()=>{
+    const id=th.closest("table").id, k=th.dataset.k;
+    sortBy[id]= sortBy[id][0]===k ? [k,-sortBy[id][1]] : [k,-1];
+    render();
+  };
+});
+document.getElementById("tok").addEventListener("keydown",e=>{if(e.key==="Enter")saveTok()});
+load();
+setInterval(()=>{if(localStorage.getItem(K)&&!document.hidden)load()},60000);
+</script>
+</body>
+</html>

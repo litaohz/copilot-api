@@ -1,17 +1,17 @@
 {
   "name": "xc-copilot-api",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "Turn GitHub Copilot into OpenAI/Anthropic API compatible server. Usable with Claude Code and Codex",
   "keywords": [
     "proxy",
     "github-copilot",
     "openai-compatible"
   ],
-  "homepage": "https://github.com/billxc/copilot-api",
-  "bugs": "https://github.com/billxc/copilot-api/issues",
+  "homepage": "https://github.com/litaohz/copilot-api",
+  "bugs": "https://github.com/litaohz/copilot-api/issues",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/billxc/copilot-api.git"
+    "url": "git+https://github.com/litaohz/copilot-api.git"
   },
   "author": "Xiaochen <wxc9312@gmail.com>",
   "type": "module",
@@ -28,13 +28,10 @@
     "lint": "eslint --cache",
     "lint:all": "eslint --cache .",
     "prepack": "bun run build",
-    "prepare": "simple-git-hooks",
     "release": "bumpp && bun publish --access public",
     "start": "NODE_ENV=production bun run ./src/main.ts start",
     "typecheck": "tsc"
   },
-  "simple-git-hooks": {},
-  "lint-staged": {},
   "dependencies": {
     "citty": "^0.1.6",
     "consola": "^3.4.2",
@@ -52,7 +49,7 @@
     "bumpp": "^10.2.3",
     "eslint": "^9.37.0",
     "knip": "^5.64.1",
-    "simple-git-hooks": "^2.13.1",
+    "prettier-plugin-packagejson": "^3.0.2",
     "tsdown": "^0.15.6",
     "typescript": "^5.9.3"
   }

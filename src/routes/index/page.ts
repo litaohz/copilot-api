@@ -1,0 +1,659 @@
+// AUTO-GENERATED from docs/index.html. Do not edit.
+export const renderDashboard = (versionBadge: string): string => `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Copilot API Dashboard</title>
+
+    <script>
+      (function() {
+        const saved = localStorage.getItem("theme");
+        if (saved === "dark" || saved === "light") {
+          document.documentElement.setAttribute("data-theme", saved);
+        }
+      })();
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-elevated: #fafafa;
+        --bg-hover: #f4f4f5;
+        --border: #e4e4e7;
+        --border-strong: #d4d4d8;
+        --fg: #09090b;
+        --fg-muted: #52525b;
+        --fg-subtle: #a1a1aa;
+        --accent: #2563eb;
+        --accent-hover: #3b82f6;
+        --success: #059669;
+        --warning: #d97706;
+        --danger: #dc2626;
+        --purple: #9333ea;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --bg: #0a0a0a;
+          --bg-elevated: #111111;
+          --bg-hover: #1a1a1a;
+          --border: #1f1f1f;
+          --border-strong: #2a2a2a;
+          --fg: #fafafa;
+          --fg-muted: #a1a1aa;
+          --fg-subtle: #71717a;
+          --accent: #3b82f6;
+          --accent-hover: #60a5fa;
+          --success: #10b981;
+          --warning: #f59e0b;
+          --danger: #ef4444;
+          --purple: #a855f7;
+        }
+      }
+
+      :root[data-theme="dark"] {
+        --bg: #0a0a0a;
+        --bg-elevated: #111111;
+        --bg-hover: #1a1a1a;
+        --border: #1f1f1f;
+        --border-strong: #2a2a2a;
+        --fg: #fafafa;
+        --fg-muted: #a1a1aa;
+        --fg-subtle: #71717a;
+        --accent: #3b82f6;
+        --accent-hover: #60a5fa;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --purple: #a855f7;
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: "Inter", system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      .font-mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+
+      .card {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+      }
+
+      .input {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--fg);
+        padding: 0.5rem 0.875rem;
+        font-size: 0.875rem;
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+      .input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgb(59 130 246 / 0.15);
+      }
+
+      .btn {
+        background: var(--fg);
+        color: var(--bg);
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: opacity 0.15s, transform 0.05s;
+        border: 0;
+        cursor: pointer;
+      }
+      .btn:hover { opacity: 0.9; }
+      .btn:active { transform: scale(0.98); }
+
+      .btn-ghost {
+        background: transparent;
+        color: var(--fg-muted);
+        border: 1px solid var(--border-strong);
+        border-radius: 6px;
+        padding: 0.25rem 0.625rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+      }
+      .btn-ghost:hover {
+        background: var(--bg-hover);
+        color: var(--fg);
+      }
+
+      .tab {
+        padding: 0.625rem 0;
+        margin-right: 1.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--fg-subtle);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+        transition: color 0.15s, border-color 0.15s;
+      }
+      .tab:hover { color: var(--fg-muted); }
+      .tab.active {
+        color: var(--fg);
+        border-bottom-color: var(--fg);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.125rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.6875rem;
+        font-weight: 500;
+        font-family: "JetBrains Mono", monospace;
+        background: var(--bg-hover);
+        color: var(--fg-muted);
+        border: 1px solid var(--border);
+      }
+
+      .progress-track {
+        background: var(--border);
+        border-radius: 9999px;
+        height: 6px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 9999px;
+        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      pre, code { font-family: "JetBrains Mono", ui-monospace, monospace; }
+
+      .code-block {
+        background: var(--bg);
+        border-radius: 0 0 12px 12px;
+      }
+
+      ::-webkit-scrollbar { width: 8px; height: 8px; }
+      ::-webkit-scrollbar-track { background: var(--bg); }
+      ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: var(--fg-subtle); }
+
+      .spinner {
+        width: 32px;
+        height: 32px;
+        border: 2px solid var(--border);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      .fade-in { animation: fadeIn 0.3s ease-out; }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      details[open] > summary .chevron { transform: rotate(90deg); }
+      summary::-webkit-details-marker { display: none; }
+    </style>
+  </head>
+  <body>
+    <div class="min-h-screen">
+      <div class="max-w-6xl mx-auto px-6 py-10">
+        <!-- Header -->
+        <header class="mb-10 flex items-start justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--accent), var(--purple))">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                  <path d="M2 17l10 5 10-5"/>
+                  <path d="M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <h1 class="text-xl font-semibold tracking-tight">Copilot API</h1>
+              <span id="version-slot">${versionBadge}</span>
+            </div>
+            <p class="text-sm" style="color: var(--fg-subtle)">Monitor usage, browse models, and configure clients</p>
+          </div>
+          <button id="theme-toggle" class="btn-ghost flex items-center justify-center" style="width: 36px; height: 36px; padding: 0" aria-label="Toggle theme">
+            <svg id="theme-icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+            </svg>
+            <svg id="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
+        </header>
+
+        <!-- Server Connection -->
+        <div class="card p-4 mb-8">
+          <div class="flex items-center gap-3">
+            <div class="flex-1 flex items-center gap-2">
+              <div id="status-dot" class="w-2 h-2 rounded-full" style="background: var(--fg-subtle)"></div>
+              <input
+                type="text"
+                id="base-url"
+                class="input flex-1 font-mono"
+                placeholder="http://localhost:4141"
+              />
+            </div>
+            <button id="connect-btn" class="btn">Connect</button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex border-b mb-6" style="border-color: var(--border)">
+          <button class="tab active" data-tab="usage">Usage</button>
+          <button class="tab" data-tab="models">Models</button>
+          <button class="tab" data-tab="config">Config</button>
+        </div>
+
+        <!-- Content -->
+        <main id="content-area" class="fade-in"></main>
+      </div>
+
+      <footer class="text-center py-6 text-xs" style="color: var(--fg-subtle)">
+        <a href="https://github.com/billxc/copilot-api" target="_blank" rel="noopener noreferrer"
+          class="hover:underline" style="color: var(--fg-muted)">github.com/billxc/copilot-api</a>
+      </footer>
+    </div>
+
+    <script>
+      function copyToClipboard(btn) {
+        const code = btn.getAttribute("data-code");
+        navigator.clipboard.writeText(code).then(() => {
+          const orig = btn.textContent;
+          btn.textContent = "Copied";
+          btn.style.color = "var(--success)";
+          setTimeout(() => { btn.textContent = orig; btn.style.color = ""; }, 1500);
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        // Theme toggle
+        const themeToggle = document.getElementById("theme-toggle");
+        const sunIcon = document.getElementById("theme-icon-sun");
+        const moonIcon = document.getElementById("theme-icon-moon");
+
+        function currentTheme() {
+          const set = document.documentElement.getAttribute("data-theme");
+          if (set) return set;
+          return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        function updateThemeIcon() {
+          const isDark = currentTheme() === "dark";
+          sunIcon.style.display = isDark ? "block" : "none";
+          moonIcon.style.display = isDark ? "none" : "block";
+        }
+        themeToggle.addEventListener("click", () => {
+          const next = currentTheme() === "dark" ? "light" : "dark";
+          document.documentElement.setAttribute("data-theme", next);
+          localStorage.setItem("theme", next);
+          updateThemeIcon();
+        });
+        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+          if (!document.documentElement.getAttribute("data-theme")) updateThemeIcon();
+        });
+        updateThemeIcon();
+
+        const baseUrlInput = document.getElementById("base-url");
+        const connectBtn = document.getElementById("connect-btn");
+        const statusDot = document.getElementById("status-dot");
+        const contentArea = document.getElementById("content-area");
+        const tabBtns = document.querySelectorAll(".tab");
+
+        const DEFAULT_BASE = "http://localhost:4141";
+        let activeTab = "usage";
+        let usageData = null;
+        let modelsData = null;
+        let isLoading = false;
+        let error = null;
+
+        tabBtns.forEach(btn => {
+          btn.addEventListener("click", () => {
+            activeTab = btn.dataset.tab;
+            tabBtns.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            render();
+          });
+        });
+
+        connectBtn.addEventListener("click", () => connect());
+        baseUrlInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") connect();
+        });
+
+        function connect() {
+          const base = baseUrlInput.value.trim().replace(/\\/+$/, "");
+          try {
+            const u = new URL(window.location);
+            u.searchParams.set("endpoint", base);
+            window.history.pushState({}, "", u);
+          } catch (e) {}
+          fetchAll(base);
+        }
+
+        async function fetchAll(base) {
+          isLoading = true;
+          error = null;
+          statusDot.style.background = "var(--warning)";
+          render();
+          try {
+            const [usageRes, modelsRes] = await Promise.all([
+              fetch(base + "/usage"),
+              fetch(base + "/models"),
+            ]);
+            if (!usageRes.ok) throw new Error("Usage: " + usageRes.status);
+            if (!modelsRes.ok) throw new Error("Models: " + modelsRes.status);
+            usageData = await usageRes.json();
+            modelsData = await modelsRes.json();
+            // Populate version badge if it wasn't server-rendered.
+            const slot = document.getElementById("version-slot");
+            if (slot && !slot.firstElementChild) {
+              try {
+                const r = await fetch(base + "/?format=json");
+                if (r.ok) {
+                  const info = await r.json();
+                  if (info && info.version) {
+                    slot.innerHTML = \`<span class="text-xs px-2 py-0.5 rounded-full font-mono" style="background: var(--bg-hover); color: var(--fg-muted)">v\${info.version}</span>\`;
+                  }
+                }
+              } catch {}
+            }
+            statusDot.style.background = "var(--success)";
+          } catch (e) {
+            error = e.message;
+            usageData = null;
+            modelsData = null;
+            statusDot.style.background = "var(--danger)";
+          } finally {
+            isLoading = false;
+            render();
+          }
+        }
+
+        function render() {
+          contentArea.classList.remove("fade-in");
+          void contentArea.offsetWidth;
+          contentArea.classList.add("fade-in");
+
+          if (isLoading && activeTab !== "config") {
+            contentArea.innerHTML = renderSpinner();
+            return;
+          }
+          if (error && activeTab !== "config") {
+            contentArea.innerHTML = renderError(error);
+            return;
+          }
+          if (activeTab === "usage") {
+            contentArea.innerHTML = usageData ? renderUsage(usageData) : renderEmpty("Connect to view usage data");
+          } else if (activeTab === "models") {
+            contentArea.innerHTML = modelsData ? renderModels(modelsData) : renderEmpty("Connect to view available models");
+          } else if (activeTab === "config") {
+            contentArea.innerHTML = renderConfig();
+          }
+        }
+
+        // === Usage Tab ===
+        function renderUsage(data) {
+          const quotas = data.quota_snapshots ? renderQuotas(data.quota_snapshots) : "";
+          const details = renderRawData(data);
+          return quotas + details;
+        }
+
+        function renderQuotas(snapshots) {
+          const cards = Object.entries(snapshots).map(([k, v]) => renderQuotaCard(k, v)).join("");
+          return \`
+            <section class="mb-8">
+              <h2 class="text-xs uppercase tracking-wider mb-4 font-medium" style="color: var(--fg-subtle)">Quotas</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">\${cards}</div>
+            </section>\`;
+        }
+
+        function renderQuotaCard(title, d) {
+          const pctUsed = d.unlimited ? 0 : 100 - d.percent_remaining;
+          const used = d.unlimited ? "—" : (d.entitlement - d.remaining).toLocaleString();
+          let barColor = "var(--success)";
+          if (pctUsed > 75) barColor = "var(--warning)";
+          if (pctUsed > 90) barColor = "var(--danger)";
+          if (d.unlimited) barColor = "var(--accent)";
+
+          return \`
+            <div class="card p-5">
+              <div class="flex justify-between items-start mb-4">
+                <h3 class="text-sm font-semibold capitalize">\${title.replace(/_/g, " ")}</h3>
+                \${d.unlimited
+                  ? \`<span class="badge" style="color: var(--accent); border-color: var(--accent)">Unlimited</span>\`
+                  : \`<span class="text-xs font-mono" style="color: var(--fg-muted)">\${pctUsed.toFixed(1)}%</span>\`
+                }
+              </div>
+              <div class="progress-track mb-3">
+                <div class="progress-fill" style="width: \${d.unlimited ? 100 : pctUsed}%; background: \${barColor}"></div>
+              </div>
+              <div class="flex justify-between text-xs font-mono" style="color: var(--fg-subtle)">
+                <span>\${used} / \${d.unlimited ? "∞" : d.entitlement.toLocaleString()}</span>
+                <span>\${d.unlimited ? "∞" : d.remaining.toLocaleString()} left</span>
+              </div>
+            </div>\`;
+        }
+
+        function renderRawData(data) {
+          return \`
+            <details>
+              <summary class="flex items-center justify-between mb-4 cursor-pointer list-none">
+                <h2 class="text-xs uppercase tracking-wider font-medium flex items-center gap-2" style="color: var(--fg-subtle)">
+                  <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.15s">
+                    <polyline points="9 18 15 12 9 6"/>
+                  </svg>
+                  Raw Response
+                </h2>
+                <button class="btn-ghost" onclick='event.preventDefault(); copyToClipboard(this)' data-code='\${escapeAttr(JSON.stringify(data, null, 2))}'>Copy</button>
+              </summary>
+              <div class="card overflow-hidden">
+                <pre class="p-5 text-xs overflow-auto" style="color: var(--fg-muted); max-height: 480px">\${escapeHtml(JSON.stringify(data, null, 2))}</pre>
+              </div>
+            </details>\`;
+        }
+
+        // === Models Tab ===
+        function renderModels(data) {
+          const models = data.data || [];
+          if (models.length === 0) return renderEmpty("No models available");
+
+          const vendorColors = {
+            azure: "var(--accent)",
+            anthropic: "var(--purple)",
+            openai: "var(--success)",
+            google: "var(--warning)",
+          };
+
+          // Group by vendor
+          const grouped = {};
+          models.forEach(m => {
+            const v = (m.owned_by || "other").toLowerCase();
+            if (!grouped[v]) grouped[v] = [];
+            grouped[v].push(m);
+          });
+
+          const sections = Object.entries(grouped).map(([vendor, items]) => {
+            const color = vendorColors[vendor] || "var(--fg-subtle)";
+            const cards = items.map(m => \`
+              <div class="card p-4 hover:border-zinc-700 transition-colors" style="transition: border-color 0.15s">
+                <h3 class="text-sm font-semibold mb-1">\${escapeHtml(m.display_name || m.id)}</h3>
+                <code class="text-xs font-mono" style="color: var(--fg-subtle)">\${escapeHtml(m.id)}</code>
+              </div>
+            \`).join("");
+            return \`
+              <section class="mb-8">
+                <div class="flex items-center gap-2 mb-4">
+                  <div class="w-1.5 h-1.5 rounded-full" style="background: \${color}"></div>
+                  <h2 class="text-xs uppercase tracking-wider font-medium capitalize" style="color: var(--fg-subtle)">\${escapeHtml(vendor)}</h2>
+                  <span class="text-xs font-mono" style="color: var(--fg-subtle)">\${items.length}</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">\${cards}</div>
+              </section>\`;
+          }).join("");
+
+          return sections + renderRawData(data);
+        }
+
+        // === Config Tab ===
+        function renderConfig() {
+          const base = baseUrlInput.value.trim().replace(/\\/+$/, "") || DEFAULT_BASE;
+
+          const configs = [
+            {
+              title: "Claude Code",
+              variant: "Opus 4.7",
+              path: "~/.claude/settings.json",
+              lang: "json",
+              code: JSON.stringify({
+                env: {
+                  ANTHROPIC_BASE_URL: base,
+                  ANTHROPIC_AUTH_TOKEN: "Powered by xc copilot",
+                  ANTHROPIC_DEFAULT_OPUS_MODEL: "claude-opus-4.7-1m-internal",
+                  CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS: "1",
+                },
+              }, null, 2),
+            },
+            {
+              title: "Claude Code",
+              variant: "Opus 4.6",
+              path: "~/.claude/settings.json",
+              lang: "json",
+              code: JSON.stringify({
+                env: {
+                  ANTHROPIC_BASE_URL: base,
+                  ANTHROPIC_AUTH_TOKEN: "Powered by xc copilot",
+                  ANTHROPIC_DEFAULT_OPUS_MODEL: "claude-opus-4.6-1m",
+                  CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS: "1",
+                },
+              }, null, 2),
+            },
+            {
+              title: "Codex CLI",
+              variant: "GPT-5.5",
+              path: "~/.codex/config.toml",
+              lang: "toml",
+              code: \`model = "gpt-5.5"\\nmodel_provider = "copilot-api"\\n\\n[model_providers.copilot-api]\\nname = "copilot-api"\\nbase_url = "\${base}/v1"\\nwire_api = "responses"\`,
+            },
+            {
+              title: "Quick Setup",
+              variant: "CLI",
+              path: "Run in terminal",
+              lang: "bash",
+              code: \`# Start the server\\nnpx xc-copilot-api@latest start\\n\\n# Configure Claude Code (Opus 4.7 by default)\\nnpx xc-copilot-api@latest config --claude\\n\\n# Or Opus 4.6\\nnpx xc-copilot-api@latest config --claude -m 4.6\\n\\n# Configure Codex CLI\\nnpx xc-copilot-api@latest config --codex\`,
+            },
+          ];
+
+          const cards = configs.map(c => \`
+            <div class="card overflow-hidden">
+              <div class="flex items-center justify-between px-4 py-3" style="border-bottom: 1px solid var(--border)">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-sm font-semibold">\${escapeHtml(c.title)}</h3>
+                    <span class="badge">\${escapeHtml(c.variant)}</span>
+                  </div>
+                  <p class="text-xs font-mono mt-1 truncate" style="color: var(--fg-subtle)">\${escapeHtml(c.path)}</p>
+                </div>
+                <button class="btn-ghost flex-shrink-0" onclick="copyToClipboard(this)" data-code="\${escapeAttr(c.code)}">Copy</button>
+              </div>
+              <pre class="code-block px-4 py-3 text-xs overflow-x-auto" style="color: var(--fg-muted)">\${escapeHtml(c.code)}</pre>
+            </div>
+          \`).join("");
+
+          return \`
+            <section>
+              <p class="text-sm mb-6" style="color: var(--fg-muted)">Examples auto-generated from server URL <code class="font-mono px-1.5 py-0.5 rounded text-xs" style="background: var(--bg-elevated); color: var(--fg)">\${escapeHtml(base)}</code></p>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">\${cards}</div>
+            </section>\`;
+        }
+
+        // === Helpers ===
+        function renderSpinner() {
+          return \`<div class="flex justify-center items-center py-24"><div class="spinner"></div></div>\`;
+        }
+
+        function renderError(msg) {
+          return \`<div class="card p-5" style="border-color: var(--danger)">
+            <div class="flex items-start gap-3">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <div>
+                <p class="text-sm font-semibold" style="color: var(--danger)">Connection failed</p>
+                <p class="text-xs mt-1 font-mono" style="color: var(--fg-muted)">\${escapeHtml(msg)}</p>
+              </div>
+            </div>
+          </div>\`;
+        }
+
+        function renderEmpty(msg) {
+          return \`<div class="card p-12 text-center">
+            <p class="text-sm" style="color: var(--fg-subtle)">\${escapeHtml(msg)}</p>
+          </div>\`;
+        }
+
+        function escapeHtml(s) {
+          const d = document.createElement("div");
+          d.appendChild(document.createTextNode(String(s)));
+          return d.innerHTML;
+        }
+
+        function escapeAttr(s) {
+          return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // === Init ===
+        const urlParams = new URLSearchParams(window.location.search);
+        let endpoint = urlParams.get("endpoint") || "";
+        if (endpoint.endsWith("/usage")) {
+          endpoint = endpoint.replace(/\\/usage$/, "");
+        }
+        // Auto-load when served from a local-ish host: loopback addresses,
+        // private LAN IP ranges, or *.local mDNS names. Public hosts (e.g.
+        // the docs site) require an explicit ?endpoint= param.
+        function isLocalHost(h) {
+          if (!h) return false;
+          if (h === "localhost" || h === "0.0.0.0") return true;
+          if (h === "[::1]" || h === "::1") return true;
+          if (/\\.local$/i.test(h)) return true;
+          if (/^127\\./.test(h)) return true;
+          if (/^10\\./.test(h)) return true;
+          if (/^192\\.168\\./.test(h)) return true;
+          if (/^172\\.(1[6-9]|2\\d|3[01])\\./.test(h)) return true;
+          return false;
+        }
+        if (!endpoint && isLocalHost(window.location.hostname)) {
+          endpoint = window.location.origin;
+        }
+        baseUrlInput.value = endpoint || DEFAULT_BASE;
+        if (endpoint) {
+          fetchAll(endpoint);
+        } else {
+          render();
+        }
+      });
+    </script>
+  </body>
+</html>
+`

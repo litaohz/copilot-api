@@ -7,6 +7,7 @@ import { serve, type ServerHandler } from "srvx"
 import { ensurePaths } from "./lib/paths"
 import { initProxyFromEnv } from "./lib/proxy"
 import { state } from "./lib/state"
+import { stats } from "./lib/stats"
 import { setupCopilotToken, setupGitHubToken } from "./lib/token"
 import { cacheModels, cacheVSCodeVersion } from "./lib/utils"
 import { server } from "./server"
@@ -21,6 +22,7 @@ interface RunServerOptions {
   githubToken?: string
   showToken: boolean
   proxyEnv: boolean
+  apiKey?: string
 }
 
 export async function runServer(options: RunServerOptions): Promise<void> {
@@ -43,7 +45,17 @@ export async function runServer(options: RunServerOptions): Promise<void> {
   state.rateLimitWait = options.rateLimitWait
   state.showToken = options.showToken
 
+  state.apiKey = options.apiKey
+  if (options.apiKey) {
+    consola.info("API key authentication enabled for incoming requests")
+  } else {
+    consola.warn(
+      "No API key set — incoming requests are unauthenticated. Set --api-key or COPILOT_API_KEY before exposing publicly.",
+    )
+  }
+
   await ensurePaths()
+  await stats.load()
   await cacheVSCodeVersion()
 
   if (options.githubToken) {
@@ -65,6 +77,17 @@ export async function runServer(options: RunServerOptions): Promise<void> {
   consola.box(
     `🌐 Usage Viewer: https://billxc.github.io/copilot-api?endpoint=${serverUrl}/usage`,
   )
+
+  // Persist monitoring stats periodically and on shutdown so they survive
+  // restarts (pm2/systemd) and the /admin/shutdown endpoint.
+  const saveInterval = setInterval(() => void stats.save(), 30_000)
+  if (typeof saveInterval.unref === "function") saveInterval.unref()
+
+  const persistAndExit = (): void => {
+    void stats.save().finally(() => process.exit(0))
+  }
+  process.on("SIGINT", persistAndExit)
+  process.on("SIGTERM", persistAndExit)
 
   serve({
     fetch: server.fetch as ServerHandler,
@@ -130,6 +153,12 @@ export const start = defineCommand({
       default: false,
       description: "Initialize proxy from environment variables",
     },
+    "api-key": {
+      alias: "k",
+      type: "string",
+      description:
+        "Require this key (Bearer token or x-api-key header) on incoming requests. Defaults to COPILOT_API_KEY env var",
+    },
   },
   run({ args }) {
     const rateLimitRaw = args["rate-limit"]
@@ -147,6 +176,8 @@ export const start = defineCommand({
       githubToken: args["github-token"],
       showToken: args["show-token"],
       proxyEnv: args["proxy-env"],
+      apiKey:
+        (args["api-key"] as string | undefined) ?? process.env.COPILOT_API_KEY,
     })
   },
 })

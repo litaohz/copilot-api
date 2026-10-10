@@ -2,6 +2,7 @@ import type { Context } from "hono"
 
 import { awaitApproval } from "~/lib/approval"
 import { checkRateLimit } from "~/lib/rate-limit"
+import { bodyWithStableIds } from "~/lib/responses/responses-compat.mjs"
 import { state } from "~/lib/state"
 import {
   createResponses,
@@ -31,8 +32,11 @@ export async function handleResponses(c: Context) {
   }
 
   const response = await createResponses(bodyText, c.req.raw.headers)
-  return new Response(response.body, {
-    status: response.status,
-    headers: getForwardHeaders(response.headers),
-  })
+  return new Response(
+    bodyWithStableIds(response, bodyText, process.env.EDGE_STABLE_IDS !== "0"),
+    {
+      status: response.status,
+      headers: getForwardHeaders(response.headers),
+    },
+  )
 }

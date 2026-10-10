@@ -11,7 +11,10 @@ node_modules/
 .eslintcache
 
 # build output
-dist/
+dist/*
+!dist/main.js
+!dist/stable-ids.mjs
+!dist/responses-compat.mjs
 claude_test/
 
 .DS_Store
@@ -19,3 +22,11 @@ claude_test/
 
 # generated
 src/routes/index/page.ts
+
+# Host configuration, credentials, and historical deployment backups.
+.env
+.env.*
+ecosystem.config.cjs
+ecosystem.config.cjs.*
+edge-id-backups/
+*.bak-*
