@@ -1,0 +1,339 @@
+{
+  "capturedAt": "2026-10-10T00:23:41.105959+00:00",
+  "upstreamCommit": "e2ee6706bd31a8f1ae14422f48411d909394f05f",
+  "runtimeRoot": "/home/taoli1/copilot-api",
+  "files": {
+    ".dockerignore": {
+      "sha256": "e5efb3619a03550ceb3c97c53f3810a54c22ed48cd2078bd0f0c20c28110a9d3",
+      "bytes": 83
+    },
+    ".gitattributes": {
+      "sha256": "d0e3e5c27914962ccfcd8e2da4904a8f691b207c1c0b6bed372708f56b5ff57d",
+      "bytes": 76
+    },
+    ".github/FUNDING.yml": {
+      "sha256": "a0fd82706aeb8da299a0bc516d90015d25d6303a78a6c4ccfcba6d91b0fb7b0b",
+      "bytes": 891
+    },
+    ".github/workflows/ci.yml": {
+      "sha256": "3f9611eb73788a5aafe1fb8ff13107361a347608d3b5ffbb331fbe8899381d30",
+      "bytes": 440
+    },
+    ".github/workflows/deploy-pages.yml": {
+      "sha256": "a73f9f1e464c86c320ce9f949d57df2303a1c97acc9f0f4735087b6168c938d8",
+      "bytes": 1012
+    },
+    ".github/workflows/docker-publish.yml": {
+      "sha256": "6a05b5ab40b8f64beea39520cc72da8cb600033f382c269adcddfc8d52fc37ae",
+      "bytes": 1594
+    },
+    ".github/workflows/release-docker.yml": {
+      "sha256": "104017c09d595650137a64fe02b770a78a67f55005cb32fdd4c0a42b980d40af",
+      "bytes": 2807
+    },
+    ".github/workflows/release.yml": {
+      "sha256": "ebce70638aa81ac04e8661600973592174f778537b90414af7aa149e4668499d",
+      "bytes": 406
+    },
+    ".gitignore": {
+      "sha256": "1267302c134aee5a395efef5a49854076809b8221542bf8c02f16e9bba3cf244",
+      "bytes": 181
+    },
+    ".vscode/settings.json": {
+      "sha256": "1dafc4b96bea0571f25f9b248f114106a97368ab38d9e93107368ff31e16441d",
+      "bytes": 194
+    },
+    "AGENTS.md": {
+      "sha256": "690864503b956d6ee5796c51dd75fc16f5a2dd483d99550ef7b582789455b14d",
+      "bytes": 1599
+    },
+    "CHANGELOG.md": {
+      "sha256": "0cbca7613c2f5e7d974c290330cb0fa170c3ab67ceb7ed4dae79270f6656cff1",
+      "bytes": 1491
+    },
+    "Dockerfile": {
+      "sha256": "7a249df369d6b861c67251b3c0cdfbcccc43d59c36673566caa8880598538c66",
+      "bytes": 585
+    },
+    "LICENSE": {
+      "sha256": "4e0a905b19eadd93117ff49e5c4ea82124e9c26b253d6ba461cbc52390b4c2b5",
+      "bytes": 1081
+    },
+    "README.md": {
+      "sha256": "bea4235566efa85b7cdadfd5f81db2fc0f222ca30aef1afaceef0c293209d2f0",
+      "bytes": 13670
+    },
+    "bun.lock": {
+      "sha256": "a3541999599dd9e123201acf302ab1e80cadccc8916edd86e1637c892987b0eb",
+      "bytes": 110583
+    },
+    "dist/main.js": {
+      "sha256": "bd22eb1f2a6be71c790fb3af2be1d6308b69da2f44129d95c60058164b2b021f",
+      "bytes": 68174
+    },
+    "dist/responses-compat.mjs": {
+      "sha256": "d28e1798edd0872f0a93d538e783458b3539f6aa29b711d3e5fc39425bbad31c",
+      "bytes": 688
+    },
+    "dist/stable-ids.mjs": {
+      "sha256": "bbb9bbdee5503526eab8160cca6b772f0cc6ec46c4a3d447912088bc75e810ae",
+      "bytes": 7612
+    },
+    "docs/index.html": {
+      "sha256": "8101a1c8c7249ac8c8cb571e5092b881211904c4d21c233d92200cc2bb0608a9",
+      "bytes": 26185
+    },
+    "entrypoint.sh": {
+      "sha256": "f150224078e5046f273b566f1f6ab6926b45774f7f776abcdb19d739528a91aa",
+      "bytes": 176
+    },
+    "eslint.config.js": {
+      "sha256": "d9314b852c296784f8630f7ea6e26d07ee49f7f242c49b929f6b26214ee683dd",
+      "bytes": 140
+    },
+    "opencode.json": {
+      "sha256": "77f8f4f3d9973414f0bddd56404d6430f0b0f5637aa18163043c1679d58b1b65",
+      "bytes": 347
+    },
+    "package.json": {
+      "sha256": "832a0a34b6b2f9dc7e82bc73dac4dbe20d9fcb43d3b34bbb12044f89578612d3",
+      "bytes": 1664
+    },
+    "scripts/generate-page.ts": {
+      "sha256": "5c069d5072ed969f31413664fa8d15fd770f999d206a10b7965687589e0d1d92",
+      "bytes": 925
+    },
+    "src/auth.ts": {
+      "sha256": "f7740c805303acec37b10da9c7bb94f1ac51ca2602b2a698b7bebf836de7e732",
+      "bytes": 1159
+    },
+    "src/check-usage.ts": {
+      "sha256": "924a5c9963b44b1fd43d43a76c9aef877a2365e1dcebb54ae11118b11883e431",
+      "bytes": 2104
+    },
+    "src/config.ts": {
+      "sha256": "9671c665b9c481e585868998bb9017de6c9b35d6b90aab1167f52ce765285c58",
+      "bytes": 5687
+    },
+    "src/debug.ts": {
+      "sha256": "f547f91dff0ad3b6d7c873f48a22bbe09997f52cf516c642310c3d1744e3b4ca",
+      "bytes": 2870
+    },
+    "src/lib/api-config.ts": {
+      "sha256": "cbc382a0b4d2a19bd2e72afebbe833c6573737fdf755b5de84491c44d1871417",
+      "bytes": 1809
+    },
+    "src/lib/approval.ts": {
+      "sha256": "f153579ae7ea8199bb7650a1eb136e3c51ce7758662ccf732af1d549ae683f33",
+      "bytes": 355
+    },
+    "src/lib/auth.ts": {
+      "sha256": "8ea2e7a41d7a78ca0fde57f6db3301189264389771dd2f282c4fd6560258c2b4",
+      "bytes": 1643
+    },
+    "src/lib/error.ts": {
+      "sha256": "ae6bceb983c25f2a3a26ffd6a3d7355257067fab2258f79670107f50e46e609b",
+      "bytes": 985
+    },
+    "src/lib/logger.ts": {
+      "sha256": "94fb54e0a71a331338a352f5eb536aacbf8b816d1a8db4a2a03d56355b9dd8c6",
+      "bytes": 666
+    },
+    "src/lib/paths.ts": {
+      "sha256": "31efc783f9cc3da63bb251dfecdad2bdc0aa96a836672b0bab59d31a31d4d76c",
+      "bytes": 646
+    },
+    "src/lib/proxy.ts": {
+      "sha256": "89cd4e33256509ee73275bf40d33240b8dd28399604edd02c1f2cf9d188c3219",
+      "bytes": 2261
+    },
+    "src/lib/rate-limit.ts": {
+      "sha256": "60c82e60c83ad9a1757af837a01d8530b9b50422e91958eccd68a1b66d216fa3",
+      "bytes": 1217
+    },
+    "src/lib/state.ts": {
+      "sha256": "edd7aa58a57070652d3908fae46a57be632fb702907300bb744d4ad1f4ae2448",
+      "bytes": 739
+    },
+    "src/lib/stats-middleware.ts": {
+      "sha256": "2ad6b95ac5afd8a51716206a46224ad55a032b7c6b0ee1842a100b1aa6b4acb4",
+      "bytes": 2988
+    },
+    "src/lib/stats.ts": {
+      "sha256": "1b16bf1cc6b7a50dc1c11fcd8732ac2eb446d85240169db99d73b7ffeb02d9be",
+      "bytes": 7393
+    },
+    "src/lib/token.ts": {
+      "sha256": "40bcbb8900e285022b12eb8b68ebcbb75bf62c8eda006e7b93471413c096a198",
+      "bytes": 4186
+    },
+    "src/lib/tokenizer.ts": {
+      "sha256": "c6defd63d8006974d2c78dfaa1977d98c87336aea7fb6007bbc00d4980fa4446",
+      "bytes": 9022
+    },
+    "src/lib/utils.ts": {
+      "sha256": "4ce089931785ecfca19030570954d959edd4f81b49f4eae603fa5cc928815f43",
+      "bytes": 696
+    },
+    "src/main.ts": {
+      "sha256": "488749a165feb9bcc53d71c941645626063fd152fd46bf36e2710203add4e44e",
+      "bytes": 847
+    },
+    "src/routes/admin/route.ts": {
+      "sha256": "7eca6aeb548ae65189cb3f669cef77c6160d6eef15775d2d65a39e72549ebaba",
+      "bytes": 1314
+    },
+    "src/routes/chat-completions/handler.ts": {
+      "sha256": "2c6a829d8254faaa04ba821998b7fdf00ef0486e3ceefcae49731033f05b0ff1",
+      "bytes": 2104
+    },
+    "src/routes/chat-completions/route.ts": {
+      "sha256": "4a7de28bb33b08fa032859efedbf183946c8e9cee41a4c7273bdfa2d1ff03573",
+      "bytes": 317
+    },
+    "src/routes/embeddings/route.ts": {
+      "sha256": "d81db737f258c0fe8f1b6d06a64d54e02f4fc8c81c3a1d391144673e0fb7b539",
+      "bytes": 469
+    },
+    "src/routes/index/page.ts": {
+      "sha256": "e3881c0a7ec1a7620cc016c7042913525585136225b9f975b7b0ee628da2f7fe",
+      "bytes": 26386
+    },
+    "src/routes/index/route.ts": {
+      "sha256": "6be1abd5de7d8f98a5ba9730a0e7e05b84ac479abaa33217197105d2e65ebcd7",
+      "bytes": 954
+    },
+    "src/routes/messages/anthropic-types.ts": {
+      "sha256": "d3e809c26fd8f43263b61b17c089160bbac8d10d10c6bcaedfc4ffd17508762f",
+      "bytes": 4522
+    },
+    "src/routes/messages/count-tokens-handler.ts": {
+      "sha256": "d14d2386521384e46421598b3a694c9f3ac435fe8f434c9154063fa249025bc9",
+      "bytes": 2700
+    },
+    "src/routes/messages/handler.ts": {
+      "sha256": "8ae8e8411f83311a879c488d84bc6b1b8bb8dfff98a2a2de0a0264e8972f23fe",
+      "bytes": 3122
+    },
+    "src/routes/messages/non-stream-translation.ts": {
+      "sha256": "6f57530af9d86e18f89f9e1ef9d0fd855d3a4cfe1cb9c3f9018830e1c29980e2",
+      "bytes": 9779
+    },
+    "src/routes/messages/route.ts": {
+      "sha256": "ba076839ef9f5d1a9b1fa02ea5e3af19f20dc113a5f941b18f031ba9f507ff3b",
+      "bytes": 535
+    },
+    "src/routes/messages/stream-translation.ts": {
+      "sha256": "fb1a7909934ea888a979f037fad94d42f444adb5b9c0ce617db9542a1774b430",
+      "bytes": 4947
+    },
+    "src/routes/messages/utils.ts": {
+      "sha256": "9e5669954d18f3003b2f6c792ea6719bbf77d588d4312193c8b5bc49725ac916",
+      "bytes": 459
+    },
+    "src/routes/models/route.ts": {
+      "sha256": "9407e95618a71549f598c19b856fa8fabddf796bff368062b8ffd0cc63ba6a4d",
+      "bytes": 1142
+    },
+    "src/routes/responses/handler.ts": {
+      "sha256": "c3078811bbd9e3301756001fdeba40c8d4cd17dd58bc00519292256a38ab3ef0",
+      "bytes": 908
+    },
+    "src/routes/responses/route.ts": {
+      "sha256": "23aba12bd7bef21e7810270066e2290d0ed17ca0a974da5b01cdd5787ee25489",
+      "bytes": 311
+    },
+    "src/routes/token/route.ts": {
+      "sha256": "b6d9d6900f6d7a7f08daabf98c3b1712ae042de621e7b1ed3b749ce95eb7e042",
+      "bytes": 385
+    },
+    "src/routes/usage/route.ts": {
+      "sha256": "fdab14abfa08b72df272b3c64e8bff9514e6ae6d931e018713d0bcacb3b02722",
+      "bytes": 435
+    },
+    "src/server.ts": {
+      "sha256": "05ede1b3bcc7b25c81dcb69b32474d746d31cbfdc25b89b94f7b9ba2b9b2b8f4",
+      "bytes": 2248
+    },
+    "src/services/copilot/create-chat-completions.ts": {
+      "sha256": "3f5883a54fdf5e92f8603c3783b6b4d0709abdeabcd6490091fc7932d7d54109",
+      "bytes": 4695
+    },
+    "src/services/copilot/create-embeddings.ts": {
+      "sha256": "7c5ed001b2bc17d429ebbab116b1a4e27f964f719e2f79050b0306c91c276326",
+      "bytes": 935
+    },
+    "src/services/copilot/create-messages.ts": {
+      "sha256": "09cd5e931345a6fc35676d83f032eb745d95b70aaadd5afb95bc466eb533b62b",
+      "bytes": 3214
+    },
+    "src/services/copilot/create-responses.ts": {
+      "sha256": "70205203aa2ebae747ce653a1365a700320fd0a41b5e68fe58805b444b63ec14",
+      "bytes": 1605
+    },
+    "src/services/copilot/get-models.ts": {
+      "sha256": "26984b89a791a7d411eb680ef11db8e10a1c50504215f42696d6ca514c7f9973",
+      "bytes": 1142
+    },
+    "src/services/copilot/passthrough.ts": {
+      "sha256": "27bb75a29aa9d4b2f2ffd52ac261298cd22b063f9e042cbdf080150ab49db066",
+      "bytes": 3404
+    },
+    "src/services/get-vscode-version.ts": {
+      "sha256": "903bfcb195195c0a08f507c134ac6c0c270f1b38214cfce2e241df5079c3b641",
+      "bytes": 678
+    },
+    "src/services/github/get-copilot-token.ts": {
+      "sha256": "6165f0bc5466d919cdad8b8311b3e9ca49de0ddbb5a1699e3e0f952918a2c524",
+      "bytes": 614
+    },
+    "src/services/github/get-copilot-usage.ts": {
+      "sha256": "de8b20ebb85c9d2470c7d20bbecd7bcb8d6d74f10e6ba755bf6e7ec5c229ff45",
+      "bytes": 1170
+    },
+    "src/services/github/get-device-code.ts": {
+      "sha256": "174f70e3b90308c4e88abc98755cad41f497ba6b5befab8f71b75f6f6227bc2c",
+      "bytes": 744
+    },
+    "src/services/github/get-user.ts": {
+      "sha256": "3fa5a3bc636094032ccbc10da510b3d4d36879a69ac71444ed153ff21df54da4",
+      "bytes": 585
+    },
+    "src/services/github/poll-access-token.ts": {
+      "sha256": "fb2a92ad93305fe909e1e861eef696c46bf960fc2b297ec214efbba39fcfc199",
+      "bytes": 1481
+    },
+    "src/start.ts": {
+      "sha256": "b4ca4de34ed3ce5e1385eeea2d1b33208b68ed909d9434e2fce3c3ade2e828ed",
+      "bytes": 5024
+    },
+    "start.bat": {
+      "sha256": "2584c10a723c4b578e199b1456aed534731a9a12cc753da4b941c5f1e9057ea3",
+      "bytes": 477
+    },
+    "tests/anthropic-request.test.ts": {
+      "sha256": "72f325e65c77b6ab15b9bfb5b47732bfe91652e0966d7a08c8e367352188ce1a",
+      "bytes": 4411
+    },
+    "tests/anthropic-response.test.ts": {
+      "sha256": "1d49b8528bec27e6d892b62c98c5c58adec5d53e55a16e0f0f5633ed3d63f3ac",
+      "bytes": 7704
+    },
+    "tests/create-chat-completions.test.ts": {
+      "sha256": "855947dd2216e9c4bd4632b9234101c1975c54c5bd000d837ba348c63304051d",
+      "bytes": 1748
+    },
+    "tests/create-responses.test.ts": {
+      "sha256": "37d82a61e07d797eeae54146517a7200fd152c7d94defabb43d0de35d70eb2e4",
+      "bytes": 2146
+    },
+    "tsconfig.json": {
+      "sha256": "b420041b075614506b0a86101d53b51ff2e7779bf7fad09b49d79e0c034a0b96",
+      "bytes": 532
+    },
+    "tsdown.config.ts": {
+      "sha256": "f6ff6191ab53b0d18ab19b60ced827cf56c9c8b7dd58a1aa623d132c988c7c1b",
+      "bytes": 281
+    }
+  }
+}

@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 
+import { defineCommand } from "citty"
+import consola from "consola"
 import { readFile, mkdir, writeFile, copyFile } from "node:fs/promises"
 import { homedir } from "node:os"
 import { join } from "node:path"
-
-import { defineCommand } from "citty"
-import consola from "consola"
 
 async function backupFile(filePath: string): Promise<void> {
   try {
@@ -23,10 +22,15 @@ const CLAUDE_OPUS_MODELS: Record<string, string> = {
   "4.6": "claude-opus-4.6-1m",
 }
 
-async function configureClaude(port: number, modelVersion: string): Promise<void> {
+async function configureClaude(
+  port: number,
+  modelVersion: string,
+): Promise<void> {
   const opusModel = CLAUDE_OPUS_MODELS[modelVersion]
   if (!opusModel) {
-    consola.error(`Unknown Claude model version: ${modelVersion}. Supported: ${Object.keys(CLAUDE_OPUS_MODELS).join(", ")}`)
+    consola.error(
+      `Unknown Claude model version: ${modelVersion}. Supported: ${Object.keys(CLAUDE_OPUS_MODELS).join(", ")}`,
+    )
     process.exit(1)
   }
 
@@ -37,7 +41,7 @@ async function configureClaude(port: number, modelVersion: string): Promise<void
 
   let existing: Record<string, unknown> = {}
   try {
-    const raw = await readFile(configPath, "utf-8")
+    const raw = await readFile(configPath, "utf8")
     existing = JSON.parse(raw) as Record<string, unknown>
   } catch (error: unknown) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
@@ -47,9 +51,9 @@ async function configureClaude(port: number, modelVersion: string): Promise<void
   }
 
   const existingEnv =
-    typeof existing.env === "object" && existing.env !== null
-      ? (existing.env as Record<string, string>)
-      : {}
+    typeof existing.env === "object" && existing.env !== null ?
+      (existing.env as Record<string, string>)
+    : {}
 
   const merged = {
     ...existing,
@@ -64,7 +68,7 @@ async function configureClaude(port: number, modelVersion: string): Promise<void
   }
 
   await backupFile(configPath)
-  await writeFile(configPath, JSON.stringify(merged, null, 2) + "\n", "utf-8")
+  await writeFile(configPath, JSON.stringify(merged, null, 2) + "\n", "utf8")
   consola.success(`Claude Code configured: ${configPath}`)
 }
 
@@ -89,10 +93,10 @@ function setTomlTopLevelKey(
   const sectionMatch = content.match(/^\[/m)
   if (sectionMatch?.index !== undefined) {
     return (
-      content.slice(0, sectionMatch.index) +
-      line +
-      "\n" +
-      content.slice(sectionMatch.index)
+      content.slice(0, sectionMatch.index)
+      + line
+      + "\n"
+      + content.slice(sectionMatch.index)
     )
   }
   return content.trimEnd() + "\n" + line + "\n"
@@ -102,12 +106,8 @@ function setTomlTopLevelKey(
  * Set or replace an entire [section] block in a TOML string.
  * Replaces everything from the header to the next section (or EOF).
  */
-function setTomlSection(
-  content: string,
-  header: string,
-  body: string,
-): string {
-  const escaped = header.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+function setTomlSection(content: string, header: string, body: string): string {
+  const escaped = header.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)
   // Match the section header and all content up to the next section or EOF
   const pattern = new RegExp(`^\\[${escaped}\\]\\n[^[]*`, "m")
   const block = `[${header}]\n${body}\n\n`
@@ -126,7 +126,7 @@ async function configureCodex(port: number): Promise<void> {
 
   let content = ""
   try {
-    content = await readFile(configPath, "utf-8")
+    content = await readFile(configPath, "utf8")
   } catch (error: unknown) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
       consola.error(`Failed to read ${configPath}. Please fix it manually.`)
@@ -143,7 +143,7 @@ async function configureCodex(port: number): Promise<void> {
   )
 
   await backupFile(configPath)
-  await writeFile(configPath, content, "utf-8")
+  await writeFile(configPath, content, "utf8")
   consola.success(`Codex CLI configured: ${configPath}`)
 }
 

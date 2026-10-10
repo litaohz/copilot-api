@@ -1,3 +1,17 @@
+# FSD unified service and dashboard
+
+The maintained FSD deployment now lives in this repository, including proxy
+source, multi-key statistics, GPT-6 streaming compatibility and the static
+`dashboard/`. See [deployment/README.md](deployment/README.md) for the exact
+production baseline, verification command, repository history and known issues.
+
+The checked-in `dist/` files preserve the running production version. Build new
+candidates outside that directory when checking changes. Runtime behavior must
+be implemented in `src/`; do not apply new minified-bundle patches from the old
+`edge-proxy-dashboard` repository.
+
+---
+
 # Copilot API Proxy
 
 > **Fork Notice:**  
@@ -139,6 +153,7 @@ wire_api = "responses"
 | --github-token | Provide GitHub token directly                          |            | -g    |
 | --show-token   | Show tokens on fetch and refresh                       | false      |       |
 | --proxy-env    | Initialize proxy from environment variables            | false      |       |
+| --api-key      | Require this key on incoming requests (also `COPILOT_API_KEY`) |     | -k    |
 
 ### `config` Options
 
@@ -160,6 +175,40 @@ wire_api = "responses"
 | `POST /v1/embeddings`            | Create embedding vectors                       |
 | `GET  /usage`                    | Copilot usage statistics and quota             |
 | `GET  /token`                    | Current Copilot token                          |
+| `GET  /admin/stats`              | Request/token/IP monitoring snapshot           |
+| `POST /admin/pause`              | Pause: all proxy endpoints return 503          |
+| `POST /admin/resume`             | Resume from a paused state                     |
+| `POST /admin/shutdown`           | Exit the process (process managers restart it) |
+
+### Monitoring & kill switch
+
+When `--api-key` (or `COPILOT_API_KEY`) is set, the `/admin/*` endpoints are
+protected by the same key. They are designed for public deployments where you
+want visibility and an emergency stop:
+
+- `GET /admin/stats` returns total requests, token usage (per model and total),
+  per-source-IP counts (with `authorized` / `unauthorized` / `tokens` breakdown
+  so you can spot freeloading or probing), status-code totals, a `droppedNoise`
+  counter, and the most recent requests. Stats are persisted to
+  `stats.json` in the data dir and survive restarts.
+- Internet scanning noise (any path that is not a real API endpoint, e.g.
+  `/wp-includes/...`) is dropped before auth — at the nginx edge with `444`
+  (connection reset) and at the app with `404` — so it never pollutes stats and
+  leaves 401s as a meaningful "wrong key" signal. Source IPs are taken from the
+  trusted `X-Real-IP` header set by the reverse proxy, not the spoofable
+  `X-Forwarded-For`.
+- `POST /admin/pause` flips a reversible kill switch — every proxy request then
+  returns `503` while `/admin/*` stays reachable. `POST /admin/resume` restores
+  service. Use this for an immediate, reversible stop.
+- `POST /admin/shutdown` exits the process. Under pm2/systemd it is restarted
+  automatically, so for a permanent stop use the manager (e.g. `pm2 stop`).
+
+```sh
+KEY=your-api-key
+curl -H "Authorization: Bearer $KEY" http://localhost:4141/admin/stats
+curl -X POST -H "Authorization: Bearer $KEY" http://localhost:4141/admin/pause
+curl -X POST -H "Authorization: Bearer $KEY" http://localhost:4141/admin/resume
+```
 
 ## Running as a Background Service
 
@@ -193,6 +242,7 @@ Prerequisites: Bun >= 1.2.x, GitHub account with Copilot subscription.
 - Use `--rate-limit 30 --wait` to stay within Copilot's rate limits without client errors.
 - Use `--account-type business` or `enterprise` if you have a business/enterprise Copilot plan. See [official docs](https://docs.github.com/en/enterprise-cloud@latest/copilot/managing-copilot/managing-github-copilot-in-your-organization/managing-access-to-github-copilot-in-your-organization/managing-github-copilot-access-to-your-organizations-network#configuring-copilot-subscription-based-network-routing-for-your-enterprise-or-organization).
 - Use `--manual` to approve each request individually for fine-grained control.
+- **Public exposure:** when exposing the server beyond localhost, set `--api-key <key>` (or the `COPILOT_API_KEY` env var) so callers must send `Authorization: Bearer <key>` (or `x-api-key: <key>`). Without a key the endpoints are unauthenticated and anyone who can reach the port can spend your Copilot quota.
 
 <details>
 <summary><h2>Using with Docker</h2></summary>
