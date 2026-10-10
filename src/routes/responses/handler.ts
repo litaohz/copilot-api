@@ -2,6 +2,7 @@ import type { Context } from "hono"
 
 import { awaitApproval } from "~/lib/approval"
 import { checkRateLimit } from "~/lib/rate-limit"
+import { normalizeEarlyResponseFailure } from "~/lib/responses/early-failure"
 import { bodyWithStableIds } from "~/lib/responses/responses-compat.mjs"
 import { state } from "~/lib/state"
 import {
@@ -31,7 +32,9 @@ export async function handleResponses(c: Context) {
     await awaitApproval()
   }
 
-  const response = await createResponses(bodyText, c.req.raw.headers)
+  const response = await normalizeEarlyResponseFailure(
+    await createResponses(bodyText, c.req.raw.headers),
+  )
   return new Response(
     bodyWithStableIds(response, bodyText, process.env.EDGE_STABLE_IDS !== "0"),
     {

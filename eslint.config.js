@@ -5,7 +5,7 @@ export default config({
   ignores: [
     "dist/**",
     "dashboard/**",
-    "src/lib/responses/**",
+    "src/lib/responses/*.mjs",
     "tests/responses-stable-ids/**",
     "deployment/*manifest.json",
   ],

@@ -7,7 +7,10 @@ import vm from "node:vm"
 import type { RequestRecord, UsageTokens } from "~/lib/stats"
 
 const root = new URL("../", import.meta.url)
-const bundle = readFileSync(new URL("dist/main.js", root), "utf8")
+const bundle = readFileSync(
+  new URL("tests/fixtures/production-before-error-fix.txt", root),
+  "utf8",
+)
 const transpiler = new Bun.Transpiler({ loader: "ts" })
 
 function source(name: string): string {
