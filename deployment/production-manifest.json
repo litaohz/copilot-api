@@ -37,6 +37,7 @@
     "deployment/cursor/nginx.conf": "46cc5cb807ae4b9d20c3d0af0e9e30ed7480c3abe753ff54c9a25569c53b3c41",
     "deployment/cursor/release.json": "e2de114faa8c5613c8bbbb720c7128b68a4f99291055ce06d932a0218312dee7",
     "deployment/decryption-investigation.md": "57794ecfd5135c4522c6573433ce455106dfcb9ca1b0e0762286e81dfb105863",
+    "deployment/msft-rollout-20261014.md": "ee695a8edf0041ac6ebedd1781930d35a2037e74af1e7a712ee98e7cd076c941",
     "deployment/msft/README.md": "5196b515e86dff7ac38c649820abad08b387f6d7f99f3eb118ad16b6711bcc4c",
     "deployment/msft/copilot-msft.service": "54663d830350fc1e28ce16c3216ba285dc28e22fb9c93c33e0d8365e23ad0a73",
     "deployment/msft/install.py": "ad683086cd288d160f549a76c284cf34807f0194b35533989d4c69c1e721b281",
