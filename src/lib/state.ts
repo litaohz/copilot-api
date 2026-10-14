@@ -3,6 +3,9 @@ import type { ModelsResponse } from "~/services/copilot/get-models"
 export interface State {
   githubToken?: string
   copilotToken?: string
+  githubHost?: string
+  dataDir?: string
+  copilotApiBaseUrl?: string
 
   accountType: string
   githubLogin?: string

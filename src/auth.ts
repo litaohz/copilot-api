@@ -3,16 +3,22 @@
 import { defineCommand } from "citty"
 import consola from "consola"
 
+import {
+  configureGitHub,
+  githubArgs,
+  type GitHubOptions,
+} from "./lib/github-host"
 import { PATHS, ensurePaths } from "./lib/paths"
 import { state } from "./lib/state"
 import { setupGitHubToken } from "./lib/token"
 
-interface RunAuthOptions {
+interface RunAuthOptions extends GitHubOptions {
   verbose: boolean
   showToken: boolean
 }
 
 export async function runAuth(options: RunAuthOptions): Promise<void> {
+  configureGitHub(options)
   if (options.verbose) {
     consola.level = 5
     consola.info("Verbose logging enabled")
@@ -31,6 +37,7 @@ export const auth = defineCommand({
     description: "Run GitHub auth flow without running the server",
   },
   args: {
+    ...githubArgs,
     verbose: {
       alias: "v",
       type: "boolean",
@@ -47,6 +54,8 @@ export const auth = defineCommand({
     return runAuth({
       verbose: args.verbose,
       showToken: args["show-token"],
+      githubHost: args["github-host"],
+      dataDir: args["data-dir"],
     })
   },
 })

@@ -15,6 +15,10 @@ dist/*
 !dist/main.js
 !dist/stable-ids.mjs
 !dist/responses-compat.mjs
+!dist/msft/
+dist/msft/*
+!dist/msft/main.js
+!dist/msft/main.js.map
 claude_test/
 
 .DS_Store
@@ -36,3 +40,8 @@ edge-id-backups/
 /deployment/cursor/auth/
 /deployment/cursor/private/
 /deployment/cursor/*-key.txt
+
+# MSFT instance credentials stay outside the checkout.
+/deployment/msft/private/
+/deployment/msft/service.env
+/deployment/msft/*-key.txt

@@ -7,13 +7,14 @@ import { getDeviceCode } from "~/services/github/get-device-code"
 import { getGitHubUser } from "~/services/github/get-user"
 import { pollAccessToken } from "~/services/github/poll-access-token"
 
+import { applyCopilotToken } from "./copilot-session"
 import { HTTPError } from "./error"
 import { state } from "./state"
 
 const readGithubToken = () => fs.readFile(PATHS.GITHUB_TOKEN_PATH, "utf8")
 
 const writeGithubToken = (token: string) =>
-  fs.writeFile(PATHS.GITHUB_TOKEN_PATH, token)
+  fs.writeFile(PATHS.GITHUB_TOKEN_PATH, token, { mode: 0o600 })
 
 // Retry logic with exponential backoff
 const sleep = (ms: number) =>
@@ -50,8 +51,7 @@ const getCopilotTokenWithRetry = async (
 export const forceRefreshCopilotToken = async () => {
   try {
     consola.debug("Force refreshing Copilot token due to 401 response")
-    const { token } = await getCopilotTokenWithRetry()
-    state.copilotToken = token
+    applyCopilotToken(await getCopilotTokenWithRetry())
     consola.debug("Copilot token force refreshed successfully")
   } catch (error) {
     consola.error("Failed to force refresh Copilot token:", error)
@@ -60,8 +60,9 @@ export const forceRefreshCopilotToken = async () => {
 }
 
 export const setupCopilotToken = async () => {
-  const { token, refresh_in } = await getCopilotToken()
-  state.copilotToken = token
+  const session = await getCopilotToken()
+  const { token, refresh_in } = session
+  applyCopilotToken(session)
 
   // Display the Copilot token to the screen
   consola.debug("GitHub Copilot Token fetched successfully!")
@@ -69,15 +70,15 @@ export const setupCopilotToken = async () => {
     consola.info("Copilot token:", token)
   }
 
-  const refreshInterval = (refresh_in - 60) * 1000
+  const refreshInterval = Math.max(30, refresh_in - 60) * 1000
   setInterval(async () => {
     try {
       consola.debug("Refreshing Copilot token")
-      const { token } = await getCopilotTokenWithRetry()
-      state.copilotToken = token
+      const refreshed = await getCopilotTokenWithRetry()
+      applyCopilotToken(refreshed)
       consola.debug("Copilot token refreshed successfully")
       if (state.showToken) {
-        consola.info("Refreshed Copilot token:", token)
+        consola.info("Refreshed Copilot token:", refreshed.token)
       }
     } catch (error) {
       // Don't throw - just log the error and continue with old token
@@ -112,11 +113,14 @@ export async function setupGitHubToken(
 
     consola.info("Not logged in, getting new access token")
     const response = await getDeviceCode()
-    consola.debug("Device code response:", response)
 
     consola.info(
       `Please enter the code "${response.user_code}" in ${response.verification_uri}`,
     )
+    const link = new URL(response.verification_uri)
+    link.searchParams.set("user_code", response.user_code)
+    consola.info(`Authorize this instance: ${link.href}`)
+    consola.info(`This code expires in ${response.expires_in} seconds`)
 
     const token = await pollAccessToken(response)
     await writeGithubToken(token)

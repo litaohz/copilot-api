@@ -4,6 +4,11 @@ import { defineCommand } from "citty"
 import consola from "consola"
 import { serve, type ServerHandler } from "srvx"
 
+import {
+  configureGitHub,
+  githubArgs,
+  type GitHubOptions,
+} from "./lib/github-host"
 import { ensurePaths } from "./lib/paths"
 import { initProxyFromEnv } from "./lib/proxy"
 import { state } from "./lib/state"
@@ -12,8 +17,9 @@ import { setupCopilotToken, setupGitHubToken } from "./lib/token"
 import { cacheModels, cacheVSCodeVersion } from "./lib/utils"
 import { server } from "./server"
 
-interface RunServerOptions {
+interface RunServerOptions extends GitHubOptions {
   port: number
+  host?: string
   verbose: boolean
   accountType: string
   manual: boolean
@@ -26,6 +32,7 @@ interface RunServerOptions {
 }
 
 export async function runServer(options: RunServerOptions): Promise<void> {
+  configureGitHub(options)
   if (options.proxyEnv) {
     initProxyFromEnv()
   }
@@ -92,6 +99,7 @@ export async function runServer(options: RunServerOptions): Promise<void> {
   serve({
     fetch: server.fetch as ServerHandler,
     port: options.port,
+    hostname: options.host,
     idleTimeout: 255,
   } as Parameters<typeof serve>[0])
 }
@@ -102,6 +110,12 @@ export const start = defineCommand({
     description: "Start the Copilot API server",
   },
   args: {
+    ...githubArgs,
+    host: {
+      type: "string",
+      description:
+        "Listen address (use 127.0.0.1 behind a local reverse proxy)",
+    },
     port: {
       alias: "p",
       type: "string",
@@ -168,6 +182,9 @@ export const start = defineCommand({
 
     return runServer({
       port: Number.parseInt(args.port, 10),
+      host: args.host,
+      githubHost: args["github-host"],
+      dataDir: args["data-dir"],
       verbose: args.verbose,
       accountType: args["account-type"],
       manual: args.manual,

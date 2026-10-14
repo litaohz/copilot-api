@@ -1,6 +1,7 @@
 import { defineCommand } from "citty"
 import consola from "consola"
 
+import { configureGitHub, githubArgs } from "./lib/github-host"
 import { ensurePaths } from "./lib/paths"
 import { setupGitHubToken } from "./lib/token"
 import {
@@ -13,7 +14,12 @@ export const checkUsage = defineCommand({
     name: "check-usage",
     description: "Show current GitHub Copilot usage/quota information",
   },
-  async run() {
+  args: githubArgs,
+  async run({ args }) {
+    configureGitHub({
+      githubHost: args["github-host"],
+      dataDir: args["data-dir"],
+    })
     await ensurePaths()
     await setupGitHubToken()
     try {

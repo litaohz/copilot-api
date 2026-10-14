@@ -57,7 +57,7 @@ function restoredKeys(value: unknown): Set<string> {
 }
 
 const RECENT_LIMIT = 200
-const STATS_PATH = path.join(PATHS.APP_DIR, "stats.json")
+const statsPath = () => path.join(PATHS.APP_DIR, "stats.json")
 
 // Known API path prefixes. Anything else is internet scanning noise and is
 // dropped (404) before it reaches stats or auth.
@@ -236,9 +236,9 @@ class Stats {
 
   async save(): Promise<void> {
     try {
-      const tmp = `${STATS_PATH}.tmp`
+      const tmp = `${statsPath()}.tmp`
       await fs.writeFile(tmp, this.serialize())
-      await fs.rename(tmp, STATS_PATH)
+      await fs.rename(tmp, statsPath())
     } catch {
       // best-effort persistence; never crash on write failure
     }
@@ -247,7 +247,7 @@ class Stats {
   async load(): Promise<void> {
     try {
       // eslint-disable-next-line unicorn/prefer-json-parse-buffer -- JSON.parse requires a string in TypeScript.
-      const raw = await fs.readFile(STATS_PATH, "utf8")
+      const raw = await fs.readFile(statsPath(), "utf8")
       const d = JSON.parse(raw) as {
         startedAt?: number
         totalRequests?: number

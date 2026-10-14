@@ -1,0 +1,26 @@
+[Unit]
+Description=Copilot proxy for msft.ghe.com (port 4143)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=taoli1
+Group=taoli1
+WorkingDirectory=/home/taoli1/copilot-msft
+Environment=NODE_ENV=production
+EnvironmentFile=/home/taoli1/.local/share/copilot-msft/service.env
+ExecStartPre=/usr/bin/test -s /home/taoli1/.local/share/copilot-msft/github_token
+ExecStart=/home/taoli1/.nvm/versions/node/v20.19.4/bin/node /home/taoli1/copilot-msft/main.js start --github-host msft.ghe.com --account-type enterprise --data-dir /home/taoli1/.local/share/copilot-msft --host 127.0.0.1 --port 4143
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/taoli1/.local/share/copilot-msft
+
+[Install]
+WantedBy=multi-user.target

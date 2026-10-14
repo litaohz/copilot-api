@@ -1,5 +1,11 @@
 # FSD 代码与部署基线
 
+## msft.ghe.com 独立实例
+
+企业域名认证、独立端口 `4143` 和独立 API key 的配置见
+[`deployment/msft/`](msft/README.md)。源码支持企业设备授权及其返回的模型 API
+地址，新实例使用独立构建；主服务的已部署 `dist/` 保留原件。
+
 ## Cursor 代理统一维护
 
 Cursor 代理的固定发行版、配置模板、systemd 服务、Nginx 路由和安装脚本现统一放在

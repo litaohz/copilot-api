@@ -1,27 +1,35 @@
-import consola from "consola"
-
 import {
-  GITHUB_BASE_URL,
   GITHUB_CLIENT_ID,
+  githubBaseUrl,
   standardHeaders,
 } from "~/lib/api-config"
+import { HTTPError } from "~/lib/error"
+import { state } from "~/lib/state"
 import { sleep } from "~/lib/utils"
 
 import type { DeviceCodeResponse } from "./get-device-code"
 
+interface PollClock {
+  now: () => number
+  wait: (ms: number) => Promise<unknown>
+}
+
 export async function pollAccessToken(
   deviceCode: DeviceCodeResponse,
+  clock: PollClock = { now: Date.now, wait: sleep },
 ): Promise<string> {
-  // Interval is in seconds, we need to multiply by 1000 to get milliseconds
-  // I'm also adding another second, just to be safe
-  const sleepDuration = (deviceCode.interval + 1) * 1000
-  consola.debug(`Polling access token with interval of ${sleepDuration}ms`)
-
-  while (true) {
+  const expiresAt = clock.now() + deviceCode.expires_in * 1000
+  let interval = (deviceCode.interval + 1) * 1000
+  while (clock.now() + interval < expiresAt) {
+    await clock.wait(interval)
+    const remaining = expiresAt - clock.now()
+    if (remaining <= 0) break
     const response = await fetch(
-      `${GITHUB_BASE_URL}/login/oauth/access_token`,
+      `${githubBaseUrl(state)}/login/oauth/access_token`,
       {
         method: "POST",
+        redirect: "error",
+        signal: AbortSignal.timeout(Math.min(remaining, 30_000)),
         headers: standardHeaders(),
         body: JSON.stringify({
           client_id: GITHUB_CLIENT_ID,
@@ -30,29 +38,36 @@ export async function pollAccessToken(
         }),
       },
     )
-
     if (!response.ok) {
-      await sleep(sleepDuration)
-      consola.error("Failed to poll access token:", await response.text())
-
-      continue
+      throw new HTTPError("Failed to poll GitHub authorization", response)
     }
-
-    const json = await response.json()
-    consola.debug("Polling access token response:", json)
-
-    const { access_token } = json as AccessTokenResponse
-
-    if (access_token) {
-      return access_token
-    } else {
-      await sleep(sleepDuration)
+    const result = (await response.json()) as AccessTokenResponse
+    if (result.access_token) return result.access_token
+    switch (result.error) {
+      case "authorization_pending": {
+        break
+      }
+      case "slow_down": {
+        interval += 5000
+        break
+      }
+      case "access_denied": {
+        throw new Error(
+          "GitHub authorization was denied; run auth to try again",
+        )
+      }
+      case "expired_token": {
+        throw new Error("GitHub device code expired; run auth for a new code")
+      }
+      default: {
+        throw new Error("GitHub device authorization failed; run auth again")
+      }
     }
   }
+  throw new Error("GitHub device code expired; run auth for a new code")
 }
 
 interface AccessTokenResponse {
-  access_token: string
-  token_type: string
-  scope: string
+  access_token?: string
+  error?: string
 }
