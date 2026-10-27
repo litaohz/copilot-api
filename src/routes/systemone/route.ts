@@ -1,6 +1,7 @@
 import { Hono } from "hono"
 
 import { awaitApproval } from "~/lib/approval"
+import { clientDisconnectSignal } from "~/lib/client-disconnect"
 import { forwardError } from "~/lib/error"
 import { checkRateLimit } from "~/lib/rate-limit"
 import { state } from "~/lib/state"
@@ -25,7 +26,7 @@ systemOneRoutes.post("/", async (c) => {
       forwardRequestHeaders: ["content-type", "accept"],
       initiator: "user",
       errorMessage: "SystemOne request failed",
-      signal: c.req.raw.signal,
+      signal: clientDisconnectSignal(c.req.raw),
       redirect: "error",
     })
     return new Response(response.body, {

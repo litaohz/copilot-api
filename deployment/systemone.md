@@ -10,6 +10,8 @@ retry-after；401 按已有机制刷新 token 后只重试一次。
 客户端 Authorization、cookie 和自定义上游认证头不透传。
 沿用现有暂停、限流、手动批准及请求归属统计；不为未知 schema 推算 token 用量。
 客户端取消会传到本端点的上游 fetch。
+Node 运行时通过响应连接提前关闭来识别取消，避免 srvx 0.8.9 在正常读完请求正文时
+触发的 request signal 造成误取消；回归测试通过真实 Node HTTP socket 验证这两种情况。
 
 ## FSD 路径
 
