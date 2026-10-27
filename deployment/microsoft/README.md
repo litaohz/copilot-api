@@ -36,4 +36,5 @@ python3 deployment/microsoft/install.py \
 
 `POST /microsoft/v1/systemone` 通过此实例凭据转发到
 `https://copilot-api.microsoft.ghe.com/v1/systemone`（实际主机仍取自 token）。
-行为及尚未确认的上游 schema 见 [Decision API](../systemone.md)。
+已按官方文档验证 `state` / `questions` 请求，并取得分类、评分和真假概率。
+协议及可直接调用的示例见 [Decision API](../systemone.md)。

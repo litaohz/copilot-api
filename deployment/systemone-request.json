@@ -1,0 +1,27 @@
+{
+  "model": "microsoft-decision-1",
+  "state": {
+    "message": "Checkout is down again for all EU customers. This is my third request.",
+    "customer_contact_count": 3
+  },
+  "questions": {
+    "team": {
+      "type": "choice",
+      "instructions": "Which team should handle this request?",
+      "criteria": {
+        "billing": "Charges, invoices, and refunds",
+        "engineering": "Bugs, errors, and outages",
+        "support": "How-to and account questions"
+      }
+    },
+    "severity": {
+      "type": "score",
+      "instructions": "How severe is this issue?",
+      "criteria": ["Cosmetic", "Minor", "Major", "Critical"]
+    },
+    "repeat_contact": {
+      "type": "noul",
+      "instructions": "Has the customer contacted support before?"
+    }
+  }
+}

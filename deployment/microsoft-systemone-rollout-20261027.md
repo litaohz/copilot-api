@@ -45,6 +45,12 @@ HTTP socket 测试在本机 Node 24 和 VM Node 20.19.4 均通过，随后发布
 - Microsoft 直连上游与代理对同一标准聊天正文返回相同的 400 和正文。
 - `/dash`、两个原有 `.mjs` 文件字节不变；Cursor 和 AGY 的监听进程未变化。
 
-SystemOne 透传已上线，但专用 payload schema 仍未确认；以上 400 验证的是路径、
-鉴权和原样错误转发，不能当作成功取得 Decision 决策结果。协议说明见
-[systemone.md](systemone.md)。
+首次发布时专用 payload schema 尚未确认；以上 400 验证的是路径、鉴权和原样
+错误转发，不能当作成功取得 Decision 决策结果。
+
+## 同日后续：按官方 schema 调用成功
+
+用户提供 Microsoft Foundry 官方文档后，使用 `model`、`state`、`questions` 格式，
+主号、Microsoft、MSFT、ALT 公网入口均返回 200，`choice`、`score`、`noul` 三种类型均成功。
+此验证复用了已部署的程序，没有修改运行代码或重启服务。
+可复用请求及 Foundry/Copilot 的 URL、模型名称和认证差别见 [systemone.md](systemone.md)。
