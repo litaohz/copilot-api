@@ -39,6 +39,7 @@
     "deployment/cursor/nginx.conf": "46cc5cb807ae4b9d20c3d0af0e9e30ed7480c3abe753ff54c9a25569c53b3c41",
     "deployment/cursor/release.json": "e2de114faa8c5613c8bbbb720c7128b68a4f99291055ce06d932a0218312dee7",
     "deployment/decryption-investigation.md": "57794ecfd5135c4522c6573433ce455106dfcb9ca1b0e0762286e81dfb105863",
+    "deployment/microsoft-systemone-rollout-20261027.md": "a2b8f7cfbdf2fd69da531d2b06f259c590cc2c44946008c9fab800323e3f490d",
     "deployment/microsoft/README.md": "790b9e415dd2fc0f11f0d23a8da4cd4fd1fe9d29381e619d72eb1bcf738ea6dc",
     "deployment/microsoft/copilot-microsoft.service": "4c2ac6bffc730f127e80245a859a0aa4ea801064e8f441b90837a4942eb540b5",
     "deployment/microsoft/install.py": "26f3e8fe6c907abcc71a8b6539242ed25ac605e032b51cf22bae26c122eeaad6",
