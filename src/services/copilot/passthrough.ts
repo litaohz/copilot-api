@@ -35,6 +35,8 @@ interface PostCopilotPassthroughOptions {
   enableVision?: boolean
   errorMessage: string
   throwOnError?: boolean
+  signal?: AbortSignal
+  redirect?: RequestInit["redirect"]
 }
 
 export async function postCopilotPassthrough({
@@ -46,6 +48,8 @@ export async function postCopilotPassthrough({
   enableVision = false,
   errorMessage,
   throwOnError = false,
+  signal,
+  redirect,
 }: PostCopilotPassthroughOptions): Promise<Response> {
   if (!state.copilotToken) {
     throw new Error("Copilot token not found")
@@ -56,6 +60,7 @@ export async function postCopilotPassthrough({
 
   // If we get 401, try to refresh token and retry once
   if (response.status === 401) {
+    await response.body?.cancel()
     consola.warn("Received 401, attempting to refresh Copilot token and retry")
     await forceRefreshCopilotToken()
     response = await makeRequest()
@@ -95,6 +100,8 @@ export async function postCopilotPassthrough({
       method: "POST",
       headers,
       body,
+      signal,
+      redirect,
     })
   }
 }

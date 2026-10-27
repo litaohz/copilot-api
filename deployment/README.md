@@ -1,5 +1,11 @@
 # FSD 代码与部署基线
 
+## Microsoft 企业实例与 Decision API
+
+`microsoft.ghe.com` 的独立 `4144` 端口、`/microsoft/v1` 入口与认证配置见
+[`deployment/microsoft/`](microsoft/README.md)。Decision 专用端点的透传行为、
+各实例路径及 schema 限制见 [systemone.md](systemone.md)。
+
 ## msft.ghe.com 独立实例
 
 企业域名认证、独立端口 `4143` 和独立 API key 的配置见

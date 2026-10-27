@@ -13,6 +13,7 @@ import { indexRoute } from "./routes/index/route"
 import { messageRoutes } from "./routes/messages/route"
 import { modelRoutes } from "./routes/models/route"
 import { responseRoutes } from "./routes/responses/route"
+import { systemOneRoutes } from "./routes/systemone/route"
 import { tokenRoute } from "./routes/token/route"
 import { usageRoute } from "./routes/usage/route"
 
@@ -53,6 +54,7 @@ server.route("/chat/completions", completionRoutes)
 server.route("/models", modelRoutes)
 server.route("/embeddings", embeddingRoutes)
 server.route("/responses", responseRoutes)
+server.route("/systemone", systemOneRoutes)
 server.route("/usage", usageRoute)
 server.route("/token", tokenRoute)
 
@@ -61,6 +63,7 @@ server.route("/v1/chat/completions", completionRoutes)
 server.route("/v1/models", modelRoutes)
 server.route("/v1/embeddings", embeddingRoutes)
 server.route("/v1/responses", responseRoutes)
+server.route("/v1/systemone", systemOneRoutes)
 
 // Anthropic compatible endpoints
 server.route("/v1/messages", messageRoutes)

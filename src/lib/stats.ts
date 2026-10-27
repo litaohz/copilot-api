@@ -67,6 +67,7 @@ const EXACT_API_PATHS = new Set([
   "/models",
   "/embeddings",
   "/responses",
+  "/systemone",
   "/usage",
   "/token",
 ])

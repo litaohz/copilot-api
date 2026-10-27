@@ -19,6 +19,10 @@ dist/*
 dist/msft/*
 !dist/msft/main.js
 !dist/msft/main.js.map
+!dist/microsoft/
+dist/microsoft/*
+!dist/microsoft/main.js
+!dist/microsoft/main.js.map
 claude_test/
 
 .DS_Store
@@ -45,3 +49,6 @@ edge-id-backups/
 /deployment/msft/private/
 /deployment/msft/service.env
 /deployment/msft/*-key.txt
+/deployment/microsoft/private/
+/deployment/microsoft/service.env
+/deployment/microsoft/*-key.txt
