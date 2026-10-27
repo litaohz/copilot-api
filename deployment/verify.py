@@ -30,7 +30,7 @@ def main():
     git_commit = None
     if args.git:
         def git(*parts):
-            return subprocess.check_output(['git', '-c', 'safe.directory=' + str(root), '-C', str(root), *parts])
+            return subprocess.check_output(['git', '--no-optional-locks', '-c', 'safe.directory=' + str(root), '-C', str(root), *parts])
         git_commit = git('rev-parse', 'HEAD').decode().strip()
         if git('status', '--porcelain'):
             failures.append('Git working tree or index is not clean')

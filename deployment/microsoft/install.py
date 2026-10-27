@@ -78,7 +78,9 @@ def main():
     backup.mkdir(parents=True, mode=0o700)
     (backup / 'nginx-site.conf').write_bytes(previous_site)
     user = pwd.getpwnam('taoli1')
-    APP.mkdir(exist_ok=True)
+    APP.mkdir(exist_ok=True, mode=0o755)
+    APP.chmod(0o755)
+    os.chown(APP, user.pw_uid, user.pw_gid)
     STATE.mkdir(parents=True, exist_ok=True, mode=0o700)
     STATE.chmod(0o700)
     os.chown(STATE, user.pw_uid, user.pw_gid)
@@ -88,14 +90,21 @@ def main():
         target.chmod(0o600)
         os.chown(target, user.pw_uid, user.pw_gid)
     for name in ['main.js', 'main.js.map']:
-        shutil.copyfile(SOURCE / 'dist/microsoft' / name, APP / name)
-    (APP / 'package.json').write_text('{"type":"module","private":true}\n')
+        target = APP / name
+        shutil.copyfile(SOURCE / 'dist/microsoft' / name, target)
+        target.chmod(0o644)
+        os.chown(target, user.pw_uid, user.pw_gid)
+    package = APP / 'package.json'
+    package.write_text('{"type":"module","private":true}\n')
+    package.chmod(0o644)
+    os.chown(package, user.pw_uid, user.pw_gid)
     modules = APP / 'node_modules'
     if not modules.exists():
         modules.symlink_to(SOURCE / 'node_modules', target_is_directory=True)
     if modules.resolve() != (SOURCE / 'node_modules').resolve():
         raise RuntimeError('Unexpected Microsoft dependency directory')
     shutil.copyfile(SOURCE / 'deployment/microsoft/copilot-microsoft.service', UNIT)
+    UNIT.chmod(0o644)
     activated = False
     try:
         run('systemctl', 'daemon-reload')
@@ -113,6 +122,7 @@ def main():
         if not models or not models.get('data'):
             raise RuntimeError('Microsoft model readiness check failed')
         shutil.copyfile(SOURCE / 'deployment/microsoft/nginx.conf', SNIPPET)
+        SNIPPET.chmod(0o644)
         site.write_text(candidate_site)
         run('nginx', '-t')
         run('systemctl', 'reload', 'nginx')
