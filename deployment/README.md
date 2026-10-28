@@ -59,6 +59,9 @@ edge-fsd.japaneast.cloudapp.azure.com
   /v1/*、/responses 等 → Nginx → :4141 → PM2 copilot-api
   /dash              → /var/www/edge-dash/index.html
   /alt/*             → :4142 → 独立 Copilot 账号服务
+  /msft/*            → :4143 → msft.ghe.com 独立账号
+  /microsoft/*       → :4144 → microsoft.ghe.com 独立账号
+  /personal/*        → :4145 → GitHub.com 个人账号 taoli1ms
   /antigravity/v1/*   → :8317 → 独立 AGY 服务
   /cursor/v1/*        → :8318 → systemd cursor-proxy（CLIProxyAPIPlus）
 ```

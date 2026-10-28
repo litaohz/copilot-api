@@ -7,6 +7,11 @@
 - 私有状态：`/home/taoli1/.local/share/copilot-personal/`，不进入 Git。
 - 客户端配置：`~/.config/edge-proxy/personal.env`。
 
+2026-10-28 已授权并上线的账号为 `taoli1ms`。token 返回的模型地址为
+`https://api.enterprise.githubcopilot.com`，可见 36 个模型；Chat Completions、
+Responses 流式终态及 Decision 均已实测成功。发布记录见
+[personal-rollout-20261028.md](../personal-rollout-20261028.md)。
+
 该实例有独立 API key、OAuth token 和统计，不跨账号轮询。`individual` 表示
 GitHub.com 默认连接方式；实际模型地址优先使用 token 返回的 `endpoints.api`。
 账号的企业成员身份、计费归属和模型权限仍由 GitHub 决定。

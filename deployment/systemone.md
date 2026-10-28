@@ -6,6 +6,7 @@
 （更新于 2026-10-09）验证：`model`、`state`、`questions`。
 2026-10-27 已在主号、Microsoft、MSFT、ALT 的公网 Copilot 代理上取得成功的决策结果，
 不需要修改此前上线的透传代码。
+2026-10-28 新增的 GitHub.com Personal 实例同样已验证三种决策结果。
 
 代理新增 `POST /v1/systemone` 和 `POST /systemone`。每个实例使用自己的
 Copilot token 与 token 响应中的 API 地址，客户端仍使用该实例原有 API key。
@@ -26,8 +27,9 @@ Node 运行时通过响应连接提前关闭来识别取消，避免 srvx 0.8.9 
 | 副号 | `/alt/v1/systemone` | `4142` |
 | MSFT | `/msft/v1/systemone` | `4143` |
 | Microsoft | `/microsoft/v1/systemone` | `4144` |
+| Personal | `/personal/v1/systemone` | `4145` |
 
-现有 Nginx 的 `/v1/` 和 `/alt/v1/` 规则已允许这两条路径；企业实例的独立
+现有 Nginx 的 `/v1/` 和 `/alt/v1/` 规则已允许这两条路径；企业及 Personal 实例的独立
 prefix location 同样允许。根路径别名 `/systemone` 需要相应的 Nginx 白名单。
 
 ## 请求格式
