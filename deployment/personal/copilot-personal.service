@@ -1,0 +1,26 @@
+[Unit]
+Description=Copilot proxy for github.com (port 4145)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=taoli1
+Group=taoli1
+WorkingDirectory=/home/taoli1/copilot-personal
+Environment=NODE_ENV=production
+EnvironmentFile=/home/taoli1/.local/share/copilot-personal/service.env
+ExecStartPre=/usr/bin/test -s /home/taoli1/.local/share/copilot-personal/github_token
+ExecStart=/home/taoli1/.nvm/versions/node/v20.19.4/bin/node /home/taoli1/copilot-personal/main.js start --github-host github.com --account-type individual --data-dir /home/taoli1/.local/share/copilot-personal --host 127.0.0.1 --port 4145
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/taoli1/.local/share/copilot-personal
+
+[Install]
+WantedBy=multi-user.target

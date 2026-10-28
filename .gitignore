@@ -52,3 +52,6 @@ edge-id-backups/
 /deployment/microsoft/private/
 /deployment/microsoft/service.env
 /deployment/microsoft/*-key.txt
+/deployment/personal/private/
+/deployment/personal/service.env
+/deployment/personal/*-key.txt

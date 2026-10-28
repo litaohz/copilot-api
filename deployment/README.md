@@ -1,5 +1,12 @@
 # FSD 代码与部署基线
 
+## GitHub.com 个人账号与客户端配置
+
+新增个人账号使用独立 `4145` 端口和 `/personal/v1` 入口，安装与验证流程见
+[`deployment/personal/`](personal/README.md)。五套 Copilot 客户端配置统一放在
+本机 `~/.config/edge-proxy/`：`main.env`、`alt.env`、`msft.env`、
+`microsoft.env` 和 `personal.env`。这些文件包含密钥，不进入 Git。
+
 ## Microsoft 企业实例与 Decision API
 
 `microsoft.ghe.com` 的独立 `4144` 端口、`/microsoft/v1` 入口与认证配置见
