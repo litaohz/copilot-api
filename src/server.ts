@@ -9,6 +9,7 @@ import { statsMiddleware, allowlistGuard } from "~/lib/stats-middleware"
 import { adminRoute } from "./routes/admin/route"
 import { completionRoutes } from "./routes/chat-completions/route"
 import { embeddingRoutes } from "./routes/embeddings/route"
+import { imageRoutes } from "./routes/images/route"
 import { indexRoute } from "./routes/index/route"
 import { messageRoutes } from "./routes/messages/route"
 import { modelRoutes } from "./routes/models/route"
@@ -53,6 +54,7 @@ server.route("/", indexRoute)
 server.route("/chat/completions", completionRoutes)
 server.route("/models", modelRoutes)
 server.route("/embeddings", embeddingRoutes)
+server.route("/images", imageRoutes)
 server.route("/responses", responseRoutes)
 server.route("/systemone", systemOneRoutes)
 server.route("/usage", usageRoute)
@@ -62,6 +64,7 @@ server.route("/token", tokenRoute)
 server.route("/v1/chat/completions", completionRoutes)
 server.route("/v1/models", modelRoutes)
 server.route("/v1/embeddings", embeddingRoutes)
+server.route("/v1/images", imageRoutes)
 server.route("/v1/responses", responseRoutes)
 server.route("/v1/systemone", systemOneRoutes)
 

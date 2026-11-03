@@ -28,7 +28,7 @@ interface CopilotRequestHeadersOptions {
 
 interface PostCopilotPassthroughOptions {
   path: string
-  body: string
+  body: string | Uint8Array
   requestHeaders?: Headers
   forwardRequestHeaders?: ReadonlyArray<string>
   initiator: CopilotInitiator

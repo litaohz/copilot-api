@@ -9,6 +9,8 @@ const TOKEN_ENDPOINTS = [
   "/responses",
   "/messages",
   "/embeddings",
+  "/images/generations",
+  "/images/edits",
 ]
 
 function isTokenEndpoint(path: string): boolean {
@@ -19,7 +21,9 @@ async function peekModel(c: Context): Promise<string | undefined> {
   if (c.req.method !== "POST") return undefined
   try {
     const text = await c.req.raw.clone().text()
-    const match = /"model"\s*:\s*"([^"]+)"/.exec(text)
+    const match =
+      /"model"\s*:\s*"([^"]+)"/.exec(text)
+      ?? /name="model"\r?\n\r?\n([^\r\n]+)/.exec(text)
     return match?.[1]
   } catch {
     return undefined

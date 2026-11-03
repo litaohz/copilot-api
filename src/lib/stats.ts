@@ -66,6 +66,8 @@ const EXACT_API_PATHS = new Set([
   "/chat/completions",
   "/models",
   "/embeddings",
+  "/images/generations",
+  "/images/edits",
   "/responses",
   "/systemone",
   "/usage",
