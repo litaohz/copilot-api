@@ -3,7 +3,7 @@ import type { Context } from "hono"
 import { awaitApproval } from "~/lib/approval"
 import { checkRateLimit } from "~/lib/rate-limit"
 import { normalizeEarlyResponseFailure } from "~/lib/responses/early-failure"
-import { bodyWithStableIds } from "~/lib/responses/responses-compat.mjs"
+import { bodyWithStableResponseIds } from "~/lib/responses/stable-response-body"
 import { state } from "~/lib/state"
 import {
   createResponses,
@@ -36,7 +36,11 @@ export async function handleResponses(c: Context) {
     await createResponses(bodyText, c.req.raw.headers),
   )
   return new Response(
-    bodyWithStableIds(response, bodyText, process.env.EDGE_STABLE_IDS !== "0"),
+    bodyWithStableResponseIds(
+      response,
+      bodyText,
+      process.env.EDGE_STABLE_IDS !== "0",
+    ),
     {
       status: response.status,
       headers: getForwardHeaders(response.headers),

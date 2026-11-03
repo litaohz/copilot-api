@@ -7,7 +7,7 @@ import { stats } from "~/lib/stats"
 import { statsMiddleware } from "~/lib/stats-middleware"
 import { handleResponses } from "~/routes/responses/handler"
 
-test("both key headers reach the restored Responses pipeline with stable IDs and attribution", async () => {
+test("both key headers reach the GPT Responses pipeline with stable IDs and attribution", async () => {
   const originalFetch = globalThis.fetch
   const originalState = { ...state }
   const originalNames = process.env.COPILOT_API_KEY_NAMES
@@ -38,6 +38,7 @@ test("both key headers reach the restored Responses pipeline with stable IDs and
   const wire = events
     .map((event) => `data: ${JSON.stringify(event)}\n\n`)
     .join("")
+  const models = ["gpt-6-astra", "gpt-6-sol", "gpt-6.1-sol", "gpt-5.5"]
   let upstreamCalls = 0
   try {
     Object.assign(state, {
@@ -63,30 +64,31 @@ test("both key headers reach the restored Responses pipeline with stable IDs and
     app.use(statsMiddleware())
     app.use(apiKeyAuth())
     app.post("/v1/responses", handleResponses)
-    for (const headers of [
-      new Headers({ authorization: "Bearer synthetic-a" }),
-      new Headers({ "x-api-key": "synthetic-b" }),
-    ]) {
-      const response = await app.request("/v1/responses", {
-        method: "POST",
-        headers,
-        body: '{"model":"gpt-6-astra","stream":true,"input":"synthetic"}',
-      })
-      expect(response.status).toBe(200)
-      const output = await response.text()
-      expect(output).toContain("first-response")
-      expect(output).toContain("first-item")
-      expect(output).not.toContain("different-")
-    }
+    for (const model of models)
+      for (const headers of [
+        new Headers({ authorization: "Bearer synthetic-a" }),
+        new Headers({ "x-api-key": "synthetic-b" }),
+      ]) {
+        const response = await app.request("/v1/responses", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ model, stream: true, input: "synthetic" }),
+        })
+        expect(response.status).toBe(200)
+        const output = await response.text()
+        expect(output).toContain("first-response")
+        expect(output).toContain("first-item")
+        expect(output).not.toContain("different-")
+      }
     await new Promise((resolve) => setTimeout(resolve, 0))
-    expect(stats.byKey.get("integration-a")?.tokens).toBe(5)
-    expect(stats.byKey.get("integration-b")?.tokens).toBe(5)
+    expect(stats.byKey.get("integration-a")?.tokens).toBe(5 * models.length)
+    expect(stats.byKey.get("integration-b")?.tokens).toBe(5 * models.length)
     const rejected = await app.request("/v1/responses", {
       method: "POST",
       body: "{}",
     })
     expect(rejected.status).toBe(401)
-    expect(upstreamCalls).toBe(2)
+    expect(upstreamCalls).toBe(2 * models.length)
   } finally {
     // eslint-disable-next-line require-atomic-updates -- This non-concurrent test owns the fetch override until finally.
     globalThis.fetch = originalFetch
