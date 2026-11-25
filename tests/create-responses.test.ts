@@ -45,11 +45,16 @@ test("posts responses payload to the GitHub responses endpoint", async () => {
   expect(headers["X-Initiator"]).toBe("user")
 })
 
-test("allows GPT models for responses", () => {
+test("allows native GPT and adapted Gemini models for responses", () => {
   expect(isResponsesModelAllowed('{"model":"gpt-5.4"}')).toBe(true)
   expect(isResponsesModelAllowed('{"model":"gpt-4.1"}')).toBe(true)
   expect(isResponsesModelAllowed('{"model":"gpt-4o"}')).toBe(true)
+  expect(isResponsesModelAllowed('{"model":"gemini-4-carbon"}')).toBe(true)
+  expect(isResponsesModelAllowed('{"model":"gemini-3.8-flash"}')).toBe(true)
   expect(isResponsesModelAllowed('{"model":"claude-sonnet-4"}')).toBe(false)
+  expect(isResponsesModelAllowed('{"model":{"id":"gemini-4-carbon"}}')).toBe(
+    false,
+  )
   expect(isResponsesModelAllowed("{}")).toBe(false)
 })
 

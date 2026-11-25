@@ -14,7 +14,10 @@ const RESPONSE_HEADERS_TO_FORWARD = [
 
 export function isResponsesModelAllowed(bodyText: string): boolean {
   const payload = tryParsePayload(bodyText)
-  return payload?.model?.startsWith("gpt") ?? false
+  return (
+    typeof payload?.model === "string"
+    && (payload.model.startsWith("gpt") || payload.model.startsWith("gemini-"))
+  )
 }
 
 function tryParsePayload(bodyText: string): ResponsesPayload | undefined {
