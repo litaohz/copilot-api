@@ -1,4 +1,4 @@
-import { afterAll, afterEach, expect, spyOn, test } from "bun:test"
+import { afterEach, beforeEach, expect, spyOn, test } from "bun:test"
 
 import { state } from "~/lib/state"
 import { stats } from "~/lib/stats"
@@ -6,11 +6,14 @@ import { server } from "~/server"
 
 const originalState = { ...state }
 const preconnect = globalThis.fetch.preconnect
-const fetchSpy = spyOn(globalThis, "fetch")
-afterAll(() => fetchSpy.mockRestore())
+let fetchSpy: ReturnType<typeof spyOn<typeof globalThis, "fetch">>
+
+beforeEach(() => {
+  fetchSpy = spyOn(globalThis, "fetch")
+})
 
 afterEach(() => {
-  fetchSpy.mockReset()
+  fetchSpy.mockRestore()
   Object.assign(state, {
     apiKey: undefined,
     copilotToken: undefined,

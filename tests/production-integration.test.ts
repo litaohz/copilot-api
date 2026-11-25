@@ -92,7 +92,12 @@ test("both key headers reach the GPT Responses pipeline with stable IDs and attr
   } finally {
     // eslint-disable-next-line require-atomic-updates -- This non-concurrent test owns the fetch override until finally.
     globalThis.fetch = originalFetch
-    Object.assign(state, originalState)
+    Object.assign(state, {
+      apiKey: undefined,
+      copilotToken: undefined,
+      rateLimitSeconds: undefined,
+      ...originalState,
+    })
     if (originalNames === undefined) delete process.env.COPILOT_API_KEY_NAMES
     // eslint-disable-next-line require-atomic-updates -- Restore the environment owned by this non-concurrent test.
     else process.env.COPILOT_API_KEY_NAMES = originalNames

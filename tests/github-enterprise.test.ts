@@ -1,4 +1,4 @@
-import { afterAll, afterEach, expect, spyOn, test } from "bun:test"
+import { afterEach, beforeEach, expect, spyOn, test } from "bun:test"
 import { rejects } from "node:assert/strict"
 import fs from "node:fs/promises"
 import os from "node:os"
@@ -24,17 +24,22 @@ import { pollAccessToken } from "~/services/github/poll-access-token"
 
 const original = { ...state }
 const preconnect = globalThis.fetch.preconnect
-const fetchSpy = spyOn(globalThis, "fetch")
-afterAll(() => fetchSpy.mockRestore())
+let fetchSpy: ReturnType<typeof spyOn<typeof globalThis, "fetch">>
+
+beforeEach(() => {
+  fetchSpy = spyOn(globalThis, "fetch")
+})
 
 afterEach(() => {
   Object.assign(state, {
+    githubToken: undefined,
+    copilotToken: undefined,
     githubHost: undefined,
     dataDir: undefined,
     copilotApiBaseUrl: undefined,
     ...original,
   })
-  fetchSpy.mockReset()
+  fetchSpy.mockRestore()
 })
 
 const code: DeviceCodeResponse = {

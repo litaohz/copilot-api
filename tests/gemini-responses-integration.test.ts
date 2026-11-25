@@ -1,4 +1,4 @@
-import { afterAll, afterEach, expect, spyOn, test } from "bun:test"
+import { afterEach, beforeEach, expect, spyOn, test } from "bun:test"
 import { rejects } from "node:assert/strict"
 
 import { state } from "~/lib/state"
@@ -7,11 +7,14 @@ import { createGeminiResponses } from "~/services/copilot/create-gemini-response
 
 const originalState = { ...state }
 const preconnect = globalThis.fetch.preconnect
-const fetchSpy = spyOn(globalThis, "fetch")
+let fetchSpy: ReturnType<typeof spyOn<typeof globalThis, "fetch">>
 
-afterAll(() => fetchSpy.mockRestore())
+beforeEach(() => {
+  fetchSpy = spyOn(globalThis, "fetch")
+})
+
 afterEach(() => {
-  fetchSpy.mockReset()
+  fetchSpy.mockRestore()
   Object.assign(state, {
     apiKey: undefined,
     copilotToken: undefined,

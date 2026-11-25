@@ -1,14 +1,12 @@
-import { test, expect, mock } from "bun:test"
+import { afterEach, beforeEach, expect, mock, test } from "bun:test"
 
 import type { ChatCompletionsPayload } from "../src/services/copilot/create-chat-completions"
 
 import { state } from "../src/lib/state"
 import { createChatCompletions } from "../src/services/copilot/create-chat-completions"
 
-// Mock state
-state.copilotToken = "test-token"
-state.vsCodeVersion = "1.0.0"
-state.accountType = "individual"
+const originalFetch = globalThis.fetch
+const originalState = { ...state }
 
 // Helper to mock fetch
 const fetchMock = mock(
@@ -20,8 +18,24 @@ const fetchMock = mock(
     }
   },
 )
-// @ts-expect-error - Mock fetch doesn't implement all fetch properties
-;(globalThis as unknown as { fetch: typeof fetch }).fetch = fetchMock
+
+beforeEach(() => {
+  fetchMock.mockClear()
+  state.copilotToken = "test-token"
+  state.vsCodeVersion = "1.0.0"
+  state.accountType = "individual"
+  // @ts-expect-error - Mock fetch doesn't implement all fetch properties
+  ;(globalThis as unknown as { fetch: typeof fetch }).fetch = fetchMock
+})
+
+afterEach(() => {
+  globalThis.fetch = originalFetch
+  Object.assign(state, {
+    copilotToken: undefined,
+    vsCodeVersion: undefined,
+    ...originalState,
+  })
+})
 
 test("sets X-Initiator to agent if tool/assistant present", async () => {
   const payload: ChatCompletionsPayload = {
@@ -50,7 +64,7 @@ test("sets X-Initiator to user if only user present", async () => {
   await createChatCompletions(payload)
   expect(fetchMock).toHaveBeenCalled()
   const headers = (
-    fetchMock.mock.calls[1][1] as { headers: Record<string, string> }
+    fetchMock.mock.calls[0][1] as { headers: Record<string, string> }
   ).headers
   expect(headers["X-Initiator"]).toBe("user")
 })

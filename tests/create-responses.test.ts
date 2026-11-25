@@ -1,4 +1,4 @@
-import { expect, mock, test } from "bun:test"
+import { afterEach, beforeEach, expect, mock, test } from "bun:test"
 
 import { state } from "../src/lib/state"
 import {
@@ -8,9 +8,8 @@ import {
   type ResponsesPayload,
 } from "../src/services/copilot/create-responses"
 
-state.copilotToken = "test-token"
-state.vsCodeVersion = "1.0.0"
-state.accountType = "individual"
+const originalFetch = globalThis.fetch
+const originalState = { ...state }
 
 const fetchMock = mock(
   (_url: string, opts: { headers: Record<string, string> }) => {
@@ -24,8 +23,23 @@ const fetchMock = mock(
   },
 )
 
-// @ts-expect-error - Mock fetch doesn't implement all fetch properties
-;(globalThis as unknown as { fetch: typeof fetch }).fetch = fetchMock
+beforeEach(() => {
+  fetchMock.mockClear()
+  state.copilotToken = "test-token"
+  state.vsCodeVersion = "1.0.0"
+  state.accountType = "individual"
+  // @ts-expect-error - Mock fetch doesn't implement all fetch properties
+  ;(globalThis as unknown as { fetch: typeof fetch }).fetch = fetchMock
+})
+
+afterEach(() => {
+  globalThis.fetch = originalFetch
+  Object.assign(state, {
+    copilotToken: undefined,
+    vsCodeVersion: undefined,
+    ...originalState,
+  })
+})
 
 test("posts responses payload to the GitHub responses endpoint", async () => {
   const payload: ResponsesPayload = {
